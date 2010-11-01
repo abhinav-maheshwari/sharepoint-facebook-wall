@@ -1,0 +1,16 @@
+.OPTION EXPLICIT ; Generate errors 
+.Set CabinetNameTemplate= BrickRed.WebParts.Facebook.Wall.wsp     
+.Set DiskDirectoryTemplate=CDROM ; All cabinets go in single directory
+.Set CompressionType=MSZIP ; All files compressed in cabinet files
+.Set UniqueFiles="ON"
+.Set Cabinet=on
+.Set DiskDirectory1="."
+
+manifest.xml manifest.xml
+BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart
+BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.xml BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.xml
+BrickRed.WebParts.Facebook.Wall\feature.xml BrickRed.WebParts.Facebook.Wall\feature.xml
+BrickRed.WebParts.Facebook.Wall\BrickRedFeatureLogo.png IMAGES\BrickRed\BrickRedFeatureLogo.png
+BrickRed.WebParts.Facebook.Wall.dll BrickRed.WebParts.Facebook.Wall.dll
+
+

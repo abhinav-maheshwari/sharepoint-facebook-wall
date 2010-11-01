@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Feature Id="5f6fbbf2-6093-4bea-9812-42238ccce376" Title="BrickRed.WebParts.Facebook.Wall" 
+         Scope="Web" Version="1.0.0.0" Hidden="FALSE" Description="Shows Facebook feed for any give user id" ImageUrl="/BrickRed/BrickRedFeatureLogo.png" DefaultResourceFile="core" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ElementManifests>
+    <ElementManifest Location="ShowWall\ShowWall.xml" />
+    <ElementFile Location="ShowWall\ShowWall.webpart" />
+  </ElementManifests>
+</Feature>

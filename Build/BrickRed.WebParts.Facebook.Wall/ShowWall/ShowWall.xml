@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements Id="a6cd8610-e819-41d7-a45c-4eb4db06147c" xmlns="http://schemas.microsoft.com/sharepoint/" >
+  <Module Name="WebParts" List="113" Url="_catalogs/wp">
+    <File Path="ShowWall\ShowWall.webpart" Url="ShowWall.webpart" Type="GhostableInLibrary"  >
+      <Property Name="Group" Value="BrickRed"></Property>
+    </File>
+  </Module>
+</Elements>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Solution SolutionId="1f5d1b2b-c90b-46bd-b480-fd2afbbb51ca" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <FeatureManifests>
+    <FeatureManifest Location="BrickRed.WebParts.Facebook.Wall\feature.xml"  />
+  </FeatureManifests>
+  <Assemblies>
+    <Assembly Location="BrickRed.WebParts.Facebook.Wall.dll" DeploymentTarget="GlobalAssemblyCache">
+      <SafeControls>
+        <SafeControl Assembly="BrickRed.WebParts.Facebook.Wall, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" Namespace="BrickRed.WebParts.Facebook.Wall" TypeName="*" Safe="True" />
+      </SafeControls>
+    </Assembly>
+  </Assemblies>
+  <TemplateFiles>
+    <TemplateFile Location="IMAGES\BrickRed\BrickRedFeatureLogo.png"></TemplateFile>
+  </TemplateFiles>
+</Solution>
