@@ -7,10 +7,15 @@
 .Set DiskDirectory1="."
 
 manifest.xml manifest.xml
-BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart
-BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.xml BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.xml
 BrickRed.WebParts.Facebook.Wall\feature.xml BrickRed.WebParts.Facebook.Wall\feature.xml
 BrickRed.WebParts.Facebook.Wall\BrickRedFeatureLogo.png IMAGES\BrickRed\BrickRedFeatureLogo.png
 BrickRed.WebParts.Facebook.Wall.dll BrickRed.WebParts.Facebook.Wall.dll
+
+BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart
+BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.xml BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.xml
+
+BrickRed.WebParts.Facebook.Wall\WriteOnWall\WriteOnWall.webpart BrickRed.WebParts.Facebook.WriteOnWall\WriteOnWall\WriteOnWall.webpart
+BrickRed.WebParts.Facebook.Wall\WriteOnWall\WriteOnWall.xml BrickRed.WebParts.Facebook.WriteOnWall\WriteOnWall\WriteOnWall.xml
+
 
 

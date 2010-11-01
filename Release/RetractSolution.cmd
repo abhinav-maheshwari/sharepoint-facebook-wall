@@ -2,7 +2,7 @@
 @pushd
 
 
-@set url= "http://localhost"
+@set url= "<<SERVER-URL>>"
 Set FORCE_OPTION=-force
 
 @set PATH=C:\Program Files\Common Files\Microsoft Shared\web server extensions\12\BIN;%PATH% @cd %~dp0

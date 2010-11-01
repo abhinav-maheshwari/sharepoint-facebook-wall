@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <!--
+      The following Guid is used as a reference to the web part class, 
+      and it will be automatically replaced with actual type name at deployment time.
+      -->
+      <type name="BrickRed.WebParts.Facebook.Wall.WriteOnWall, BrickRed.WebParts.Facebook.Wall, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" />
+      <importErrorMessage>Cannot import WriteOnWall Web Part.</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">WriteOnWall Web Part</property>
+        <property name="Description" type="string">WriteOnWall Description</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>
