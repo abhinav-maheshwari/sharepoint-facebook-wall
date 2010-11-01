@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Feature Id="4801a6ce-31d4-4817-8015-66964b7cdc46" Title="BrickRed. Facebook WebParts" 
-         Scope="Web" Version="1.0.0.0" Hidden="FALSE" Description="Installs facebook wall and write on wall webparts" ImageUrl="/BrickRed/BrickRedFeatureLogo.png" DefaultResourceFile="core" xmlns="http://schemas.microsoft.com/sharepoint/">
+<Feature Id="4801a6ce-31d4-4817-8015-66964b7cdc46" Title="BrickRed Facebook WebParts" 
+         Scope="Web" Version="1.0.0.0" Hidden="FALSE" Description="Activate facebook wall and write on wall webparts" ImageUrl="/BrickRed/BrickRedFeatureLogo.png" DefaultResourceFile="core" xmlns="http://schemas.microsoft.com/sharepoint/">
   <ElementManifests>
     <ElementManifest Location="ShowWall\ShowWall.xml" />
     <ElementFile Location="ShowWall\ShowWall.webpart" />
