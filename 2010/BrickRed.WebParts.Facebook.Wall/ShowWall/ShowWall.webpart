@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="BrickRed.WebParts.Facebook.Wall.ShowWall, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Facebook Wall</property>
+        <property name="Description" type="string">Shows Facebook feed for any give user id</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

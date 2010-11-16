@@ -1,0 +1,8 @@
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Title="BrickRed Facebook WebParts" Description="Activate facebook wall and write on wall webparts" Id="4fcf719a-4baa-4e87-bae5-84e8c066080a" ImageUrl="/BrickRed/BrickRedFeatureLogo.png" Scope="Site">
+  <ElementManifests>
+    <ElementManifest Location="ShowWall\Elements.xml" />
+    <ElementFile Location="ShowWall\ShowWall.webpart" />
+    <ElementManifest Location="WriteOnWall\Elements.xml" />
+    <ElementFile Location="WriteOnWall\WriteOnWall.webpart" />
+  </ElementManifests>
+</Feature>
