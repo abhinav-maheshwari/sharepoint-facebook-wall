@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="25853faf-d7b8-4be2-8e38-4187a3b35ecb" solutionId="25853faf-d7b8-4be2-8e38-4187a3b35ecb" resetWebServer="false" name="BrickRed.WebParts.Facebook.Wall" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="d1ca5a00-1b44-4fa7-a7bd-6514f0590558" />
+  </features>
+  <projectItems>
+    <projectItemReference itemId="21949790-61be-46f6-ac3e-c273e27e8ed4" />
+  </projectItems>
+</package>
