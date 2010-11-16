@@ -190,7 +190,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             JSONObject obj = null;
             try
             {
-                string url = string.Format("https://graph.facebook.com/{0}/feed", this.UserID);
+                string url = string.Format("http://graph.facebook.com/{0}/feed", this.UserID);
 
                 HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
