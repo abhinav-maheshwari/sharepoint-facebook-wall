@@ -11,8 +11,8 @@
     </metaData>
     <data>
       <properties>
-        <property name="Title" type="string">Facebook Write On Wall</property>
-        <property name="Description" type="string">Webpart enables users to write comments on facebook wall</property>
+        <property name="Title" type="string">Facebook Wall</property>
+        <property name="Description" type="string">Shows Facebook feed for any give user id</property>
       </properties>
     </data>
   </webPart>
