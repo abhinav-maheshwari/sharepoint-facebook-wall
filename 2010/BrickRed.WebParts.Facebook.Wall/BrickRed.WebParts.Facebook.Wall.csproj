@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code Files\JSONObject.cs" />
+    <Compile Include="EditorParts\WriteOnWallEditorPart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowWall\ShowWall.cs" />
     <Compile Include="WriteOnWall\WriteOnWall.cs" />

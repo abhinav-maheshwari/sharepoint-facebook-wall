@@ -106,32 +106,55 @@ namespace BrickRed.WebParts.Facebook.Wall
                             if (i < this.WallCount)
                             {
                                 tr = new TableRow();
-                                mainTable.Rows.Add(tr);
+                                //mainTable.Rows.Add(tr);
                                 tc = new TableCell();
                                 tc.CssClass = "ms-vb2";
                                 tc.Width = Unit.Percentage(30);
-                                tc.Text = feed.Dictionary["message"].String;
-                                tr.Cells.Add(tc);
 
-                                if (i % 2 != 0)
+                                bool dataFound = false;
+
+                                if (feed.Dictionary.ContainsKey("message"))
                                 {
-                                    tr.CssClass = "ms-alternatingstrong";
+                                    dataFound = true;
+                                    tc.Text = feed.Dictionary["message"].String;
+                                }
+                                else if (feed.Dictionary.ContainsKey("description"))
+                                {
+                                    dataFound = true;
+                                    tc.Text = feed.Dictionary["description"].String;
+                                }
+                                else if (feed.Dictionary.ContainsKey("name"))
+                                {
+                                    dataFound = true;
+                                    tc.Text = feed.Dictionary["name"].String;
+
                                 }
 
-                                tr = new TableRow();
-                                tc = new TableCell();
-                                tc.CssClass = "ms-vb2";
-
-                                if (this.EnableShowDesc)
+                                if (dataFound)
                                 {
-                                    // tc3.VerticalAlign = VerticalAlign.Top;
-                                    mainTable.Rows.Add(tr);
-                                    tc.Text = relativeTime(feed.Dictionary["created_time"].String.ToString());
-                                    tc.Style.Add("color", "Gray");
                                     tr.Cells.Add(tc);
+                                    mainTable.Rows.Add(tr);
+
                                     if (i % 2 != 0)
                                     {
                                         tr.CssClass = "ms-alternatingstrong";
+                                    }
+
+                                    tr = new TableRow();
+                                    tc = new TableCell();
+                                    tc.CssClass = "ms-vb2";
+
+                                    if (this.EnableShowDesc)
+                                    {
+                                        // tc3.VerticalAlign = VerticalAlign.Top;
+                                        mainTable.Rows.Add(tr);
+                                        tc.Text = relativeTime(feed.Dictionary["created_time"].String.ToString());
+                                        tc.Style.Add("color", "Gray");
+                                        tr.Cells.Add(tc);
+                                        if (i % 2 != 0)
+                                        {
+                                            tr.CssClass = "ms-alternatingstrong";
+                                        }
                                     }
                                 }
 
