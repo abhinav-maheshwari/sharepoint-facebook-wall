@@ -62,16 +62,6 @@ namespace BrickRed.WebParts.Facebook.Wall
 
         public int WallCount { get; set; }
 
-        [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-       DefaultValue("true"),
-       WebDisplayName("Show Description"),
-       WebDescription("Would you like to show description")]
-
-        public bool EnableShowDesc { get; set; }
-
         #endregion
 
         protected override void CreateChildControls()
@@ -87,7 +77,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                 mainTable.Width = Unit.Percentage(100);
                 mainTable.CellSpacing = 0;
                 mainTable.CellPadding = 0;
-
                 mainTable.CssClass = "ms-viewlsts";
                 this.Controls.Add(mainTable);
 
@@ -106,59 +95,19 @@ namespace BrickRed.WebParts.Facebook.Wall
                             if (i < this.WallCount)
                             {
                                 tr = new TableRow();
-                                //mainTable.Rows.Add(tr);
+
+                                if (i % 2 != 0)
+                                {
+                                    tr.CssClass = "ms-alternatingstrong";
+                                }
+
                                 tc = new TableCell();
                                 tc.CssClass = "ms-vb2";
-                                tc.Width = Unit.Percentage(30);
-
-                                bool dataFound = false;
-
-                                if (feed.Dictionary.ContainsKey("message"))
-                                {
-                                    dataFound = true;
-                                    tc.Text = feed.Dictionary["message"].String;
-                                }
-                                else if (feed.Dictionary.ContainsKey("description"))
-                                {
-                                    dataFound = true;
-                                    tc.Text = feed.Dictionary["description"].String;
-                                }
-                                else if (feed.Dictionary.ContainsKey("name"))
-                                {
-                                    dataFound = true;
-                                    tc.Text = feed.Dictionary["name"].String;
-
-                                }
-
-                                if (dataFound)
-                                {
-                                    tr.Cells.Add(tc);
-                                    mainTable.Rows.Add(tr);
-
-                                    if (i % 2 != 0)
-                                    {
-                                        tr.CssClass = "ms-alternatingstrong";
-                                    }
-
-                                    tr = new TableRow();
-                                    tc = new TableCell();
-                                    tc.CssClass = "ms-vb2";
-
-                                    if (this.EnableShowDesc)
-                                    {
-                                        // tc3.VerticalAlign = VerticalAlign.Top;
-                                        mainTable.Rows.Add(tr);
-                                        tc.Text = relativeTime(feed.Dictionary["created_time"].String.ToString());
-                                        tc.Style.Add("color", "Gray");
-                                        tr.Cells.Add(tc);
-                                        if (i % 2 != 0)
-                                        {
-                                            tr.CssClass = "ms-alternatingstrong";
-                                        }
-                                    }
-                                }
-
+                                tc.Controls.Add(parseFeed(feed, i));
+                                tr.Cells.Add(tc);
+                                mainTable.Rows.Add(tr);
                             }
+
                             else
                             {
                                 break;
@@ -223,7 +172,6 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             try
             {
-
                 url = string.Format("http://graph.facebook.com/{0}/feed", this.UserID);
                 request = WebRequest.Create(url) as HttpWebRequest;
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
@@ -245,6 +193,160 @@ namespace BrickRed.WebParts.Facebook.Wall
                 this.Controls.Add(LblMessage);
             }
             return obj;
+        }
+
+        private Table parseFeed(JSONObject feed, int counter)
+        {
+            Table feedTable;
+            TableRow feedTableRow;
+            TableCell feedTableCell;
+            HyperLink objHyperLink;
+            Table childTable = new Table();
+            TableRow childRow = new TableRow();
+            TableCell childCell;
+
+            //first table row in main feed table
+            feedTable = new Table();
+            feedTableRow = new TableRow();
+            feedTable.Rows.Add(feedTableRow);
+
+
+            //first of all see what is the type of this feed
+
+            switch (feed.Dictionary["type"].String)
+            {
+                case "status":
+                    if (feed.Dictionary.ContainsKey("message"))
+                    {
+                        //first cell and add table of status data
+                        feedTableCell = new TableCell();
+                        feedTableRow.Cells.Add(feedTableCell);
+
+                        childTable = new Table();
+                        childTable.CellPadding = 5;
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childCell.Text = feed.Dictionary["message"].String;
+                        childRow.Cells.Add(childCell);
+                        feedTableCell.Controls.Add(childTable);
+
+                    }
+                    break;
+                case "photo":
+                case "link":
+                case "video":
+
+                    //create a feed table cell and add child table
+                    feedTableCell = new TableCell();
+                    feedTableRow.Cells.Add(feedTableCell);
+                    childTable = new Table();
+                    childTable.CellPadding = 5;
+                    feedTableCell.Controls.Add(childTable);
+
+                    if (feed.Dictionary.ContainsKey("picture"))
+                    {
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        Image image = new Image();
+                        image.ImageUrl = feed.Dictionary["picture"].String;
+
+                        childCell = new TableCell();
+                        childCell.RowSpan = 4;
+                        childRow.Cells.Add(childCell);
+                        childCell.Controls.Add(image);
+
+                    }
+
+
+                    if (feed.Dictionary.ContainsKey("name"))
+                    {
+                        //next row
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childRow.Cells.Add(childCell);
+
+                        objHyperLink = new HyperLink();
+                        childCell.Controls.Add(objHyperLink);
+                        objHyperLink.Text = feed.Dictionary["name"].String;
+                        objHyperLink.Target = "_New";
+                        if (feed.Dictionary.ContainsKey("link"))
+                        {
+                            objHyperLink.NavigateUrl = feed.Dictionary["link"].String;
+                        }
+                    }
+
+
+                    if (feed.Dictionary.ContainsKey("message"))
+                    {
+                        //next row
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childCell.Text = feed.Dictionary["message"].String;
+                        childRow.Cells.Add(childCell);
+                    }
+
+
+
+
+                    if (feed.Dictionary.ContainsKey("description"))
+                    {
+                        //first cell and add table of status data
+                        //next row
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childCell.Text = feed.Dictionary["description"].String;
+                        childRow.Cells.Add(childCell);
+                    }
+
+                    break;
+            }
+
+
+
+            //second row in main feed table to display the additional information
+
+            feedTableRow = new TableRow();
+            feedTable.Rows.Add(feedTableRow);
+            if (counter % 2 != 0)
+            {
+                feedTableRow.CssClass = "ms-alternatingstrong";
+            }
+            //first cell for feed icon
+            feedTableCell = new TableCell();
+            feedTableRow.Cells.Add(feedTableCell);
+
+            ///now the child table for data
+            childTable = new Table();
+            childTable.CellPadding = 5;
+            childRow = new TableRow();
+            childTable.Rows.Add(childRow);
+            feedTableCell.Controls.Add(childTable);
+
+
+            if (feed.Dictionary.ContainsKey("icon"))
+            {
+                Image image = new Image();
+                image.ImageUrl = feed.Dictionary["icon"].String;
+
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                childCell.Controls.Add(image);
+
+            }
+
+            if (feed.Dictionary.ContainsKey("created_time"))
+            {
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                childCell.Text = relativeTime(feed.Dictionary["created_time"].String.ToString());
+                childCell.Style.Add("color", "Gray");
+            }
+
+            return feedTable;
         }
     }
 }
