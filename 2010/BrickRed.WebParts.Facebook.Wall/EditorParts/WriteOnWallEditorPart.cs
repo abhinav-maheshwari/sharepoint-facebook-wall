@@ -166,7 +166,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             pnlPropertyControl = new Panel();
 
             lblProperty = new Label();
-            lblProperty.Text = "Show User Name:<br/><br/>";
+            lblProperty.Text = "Would you like to show current user id?";
             pnlPropertyName.Controls.Add(lblProperty);
             pnlProperty.Controls.Add(pnlPropertyName);
             
@@ -187,62 +187,33 @@ namespace BrickRed.WebParts.Facebook.Wall
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
-           
-
             pnlFacebookSettings.Controls.Add(pnlCommonSettings);
 
-
-           
-
-            LiteralControl heading = new LiteralControl("<h5>Post Location Settings:</h3>");
-
+            LiteralControl heading = new LiteralControl("Where would you like to post?");
             pnlFacebookSettings.Controls.Add(heading);
-
             LiteralControl hr = new LiteralControl("<hr style='color:black;height:1px'/>");
-
             pnlFacebookSettings.Controls.Add(hr);
-
-           
-
             pnlFacebookSettings.Controls.Add(lineBreak);
 
             //Post on your wall/page wall radio buttons
             pnlProperty = new Panel();
-          
 
+
+            //Post as this user/page radio buttons and page id text box
             rdoBtnListPostLocation = new RadioButtonList();
-            rdoBtnListPostLocation.Items.Add(new ListItem("Post on your wall", "postToYourWall"));
-            rdoBtnListPostLocation.Items.Add(new ListItem("Post on your page's wall", "postToPageWall"));
+            rdoBtnListPostLocation.Items.Add(new ListItem("On my wall", "postToYourWall"));
+            rdoBtnListPostLocation.Items.Add(new ListItem("On my page", "postToPageWall"));
             rdoBtnListPostLocation.Items.FindByValue("postToYourWall").Selected = true;
             rdoBtnListPostLocation.AutoPostBack = false;         
                      
             pnlProperty.Controls.Add(rdoBtnListPostLocation);
-
             pnlPostToWallSettings.Controls.Add(pnlProperty);
-
-
-            
-           
-            //Post as this user/page radio buttons and page id text box
-         
 
             pnlPropertyPostAsWhat = new HtmlGenericControl("div");
             pnlPropertyPostAsWhat.Attributes.Add("id", "postAsWhatDiv");
 
             pnlPropertyName = new Panel();
             pnlPropertyControl = new Panel();
-
-
-            heading = new LiteralControl("<h5>Post on page's wall settings:</h3>");
-
-            pnlPropertyPostAsWhat.Controls.Add(heading);
-
-            hr = new LiteralControl("<hr style='color:black;height:1px'/>");
-
-            pnlPropertyPostAsWhat.Controls.Add(hr);
-
-            pnlPropertyPostAsWhat.Controls.Add(lineBreak);
-
 
             Label lblPageID = new Label();
             lblPageID.Text = "Page ID:<br/><br/>";
@@ -253,9 +224,14 @@ namespace BrickRed.WebParts.Facebook.Wall
             pnlPropertyControl.Controls.Add(txtPageID);
             pnlPropertyPostAsWhat.Controls.Add(pnlPropertyControl);
 
+            pnlPropertyPostAsWhat.Controls.Add(lineBreak);
+            heading = new LiteralControl("Who should post the messages?");
+            pnlPropertyPostAsWhat.Controls.Add(heading);
+            hr = new LiteralControl("<hr style='color:black;height:1px'/>");
+            pnlPropertyPostAsWhat.Controls.Add(hr);
             rdoBtnListPostAsWhat = new RadioButtonList();
-            rdoBtnListPostAsWhat.Items.Add(new ListItem("Post as this user", "postAsThisUser"));
-            rdoBtnListPostAsWhat.Items.Add(new ListItem("Post as the page", "postAsPage"));
+            rdoBtnListPostAsWhat.Items.Add(new ListItem("Current User", "postAsThisUser"));
+            rdoBtnListPostAsWhat.Items.Add(new ListItem("Current Page", "postAsPage"));
             rdoBtnListPostAsWhat.Items[0].Selected = true;
             rdoBtnListPostAsWhat.AutoPostBack = false;
             pnlPropertyPostAsWhat.Controls.Add(rdoBtnListPostAsWhat);
