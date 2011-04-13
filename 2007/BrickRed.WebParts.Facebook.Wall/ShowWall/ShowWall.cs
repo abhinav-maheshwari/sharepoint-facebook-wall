@@ -1,4 +1,27 @@
-﻿using System;
+﻿/*
+ ===========================================================================
+ Copyright (c) 2010 BrickRed Technologies Limited
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sub-license, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ===========================================================================
+ */
+using System;
 using System.Runtime.InteropServices;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -17,10 +40,6 @@ namespace BrickRed.WebParts.Facebook.Wall
     [Guid("a6cd8610-e819-41d7-a45c-4eb4db06147c")]
     public class ShowWall : System.Web.UI.WebControls.WebParts.WebPart
     {
-        public ShowWall()
-        {
-        }
-
         Label LblMessage;
 
         #region Webpart Properties
@@ -29,8 +48,8 @@ namespace BrickRed.WebParts.Facebook.Wall
        Personalizable(PersonalizationScope.Shared),
         WebPartStorage(Storage.Shared),
        DefaultValue(""),
-       WebDisplayName("User Id / User Name"),
-       WebDescription("Please enter user id")]
+       WebDisplayName("User Id / User Name / Page Id"),
+       WebDescription("Please enter User Id /User Name/page Id")]
 
         public string UserID { get; set; }
 
@@ -45,16 +64,6 @@ namespace BrickRed.WebParts.Facebook.Wall
 
         public int WallCount { get; set; }
 
-        [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-       DefaultValue("true"),
-       WebDisplayName("Show Description"),
-       WebDescription("Would you like to show description")]
-
-        public bool EnableShowDesc { get; set; }
-
         #endregion
 
         protected override void CreateChildControls()
@@ -64,15 +73,12 @@ namespace BrickRed.WebParts.Facebook.Wall
             try
             {
                 Table mainTable;
-                TableRow tr, tr2;
-                TableCell tc, tc3;
-                Label Caption, Caption2;
+                TableRow tr;
+                TableCell tc;
                 mainTable = new Table();
                 mainTable.Width = Unit.Percentage(100);
                 mainTable.CellSpacing = 0;
-                mainTable.CellPadding = 5;
-                mainTable.BorderWidth = 1;
-
+                mainTable.CellPadding = 0;
                 mainTable.CssClass = "ms-listviewtable";
                 this.Controls.Add(mainTable);
 
@@ -91,45 +97,25 @@ namespace BrickRed.WebParts.Facebook.Wall
                             if (i < this.WallCount)
                             {
                                 tr = new TableRow();
-                                mainTable.Rows.Add(tr);
-                                tc = new TableCell();
-                                tc.Width = Unit.Percentage(30);
-                                tr.Cells.Add(tc);
 
-                                Caption = new Label();
-                                Caption.Font.Bold = true;
-                                Caption.Text = feed.Dictionary["message"].String;
-                                tc.Controls.Add(Caption);
-
-                                tr2 = new TableRow();
-                                tc3 = new TableCell();
-
-                                if (this.EnableShowDesc)
-                                {
-                                    tc3.VerticalAlign = VerticalAlign.Top;
-                                    mainTable.Rows.Add(tr2);
-                                    tr2.Cells.Add(tc3);
-
-                                    Caption2 = new Label();
-                                    Caption2.Text = relativeTime(feed.Dictionary["created_time"].String.ToString());
-                                    tc3.Controls.Add(Caption2);
-                                }
-
+                               
                                 if (i % 2 == 0)
                                 {
-                                    tr.CssClass = "";
-                                    tr2.CssClass = "";
-                                    tc.CssClass = "ms-vb";
-                                    tc3.CssClass = "ms-vb";
+                                    tr.CssClass = "";                                                                                                      
                                 }
                                 else
                                 {
-                                    tr.CssClass = "ms-alternating";
-                                    tr2.CssClass = "ms-alternating";
-                                    tc.CssClass = "ms-vb";
-                                    tc3.CssClass = "ms-vb";
+                                    tr.CssClass = "ms-alternating";                                    
                                 }
+
+
+                                tc = new TableCell();
+                                tc.CssClass = "ms-vb";
+                                tc.Controls.Add(parseFeed(feed, i));
+                                tr.Cells.Add(tc);
+                                mainTable.Rows.Add(tr);
                             }
+
                             else
                             {
                                 break;
@@ -188,11 +174,14 @@ namespace BrickRed.WebParts.Facebook.Wall
         private JSONObject GetFeeds()
         {
             JSONObject obj = null;
+            string url;
+            HttpWebRequest request;
+            string oAuthToken = string.Empty;
+
             try
             {
-                string url = string.Format("http://graph.facebook.com/{0}/feed", this.UserID);
-
-                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+                url = string.Format("http://graph.facebook.com/{0}/feed", this.UserID);
+                request = WebRequest.Create(url) as HttpWebRequest;
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
                     StreamReader reader = new StreamReader(response.GetResponseStream());
@@ -212,6 +201,160 @@ namespace BrickRed.WebParts.Facebook.Wall
                 this.Controls.Add(LblMessage);
             }
             return obj;
+        }
+
+        private Table parseFeed(JSONObject feed, int counter)
+        {
+            Table feedTable;
+            TableRow feedTableRow;
+            TableCell feedTableCell;
+            HyperLink objHyperLink;
+            Table childTable = new Table();
+            TableRow childRow = new TableRow();
+            TableCell childCell;
+
+            //first table row in main feed table
+            feedTable = new Table();
+            feedTableRow = new TableRow();
+            feedTable.Rows.Add(feedTableRow);
+
+
+            //first of all see what is the type of this feed
+
+            switch (feed.Dictionary["type"].String)
+            {
+                case "status":
+                    if (feed.Dictionary.ContainsKey("message"))
+                    {
+                        //first cell and add table of status data
+                        feedTableCell = new TableCell();
+                        feedTableRow.Cells.Add(feedTableCell);
+
+                        childTable = new Table();
+                        childTable.CellPadding = 5;
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childCell.Text = feed.Dictionary["message"].String;
+                        childRow.Cells.Add(childCell);
+                        feedTableCell.Controls.Add(childTable);
+
+                    }
+                    break;
+                case "photo":
+                case "link":
+                case "video":
+
+                    //create a feed table cell and add child table
+                    feedTableCell = new TableCell();
+                    feedTableRow.Cells.Add(feedTableCell);
+                    childTable = new Table();
+                    childTable.CellPadding = 5;
+                    feedTableCell.Controls.Add(childTable);
+
+                    if (feed.Dictionary.ContainsKey("picture"))
+                    {
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        Image image = new Image();
+                        image.ImageUrl = feed.Dictionary["picture"].String;
+
+                        childCell = new TableCell();
+                        childCell.RowSpan = 4;
+                        childRow.Cells.Add(childCell);
+                        childCell.Controls.Add(image);
+
+                    }
+
+
+                    if (feed.Dictionary.ContainsKey("name"))
+                    {
+                        //next row
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childRow.Cells.Add(childCell);
+
+                        objHyperLink = new HyperLink();
+                        childCell.Controls.Add(objHyperLink);
+                        objHyperLink.Text = feed.Dictionary["name"].String;
+                        objHyperLink.Target = "_New";
+                        if (feed.Dictionary.ContainsKey("link"))
+                        {
+                            objHyperLink.NavigateUrl = feed.Dictionary["link"].String;
+                        }
+                    }
+
+
+                    if (feed.Dictionary.ContainsKey("message"))
+                    {
+                        //next row
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childCell.Text = feed.Dictionary["message"].String;
+                        childRow.Cells.Add(childCell);
+                    }
+
+
+
+
+                    if (feed.Dictionary.ContainsKey("description"))
+                    {
+                        //first cell and add table of status data
+                        //next row
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childCell.Text = feed.Dictionary["description"].String;
+                        childRow.Cells.Add(childCell);
+                    }
+
+                    break;
+            }
+
+
+
+            //second row in main feed table to display the additional information
+
+            feedTableRow = new TableRow();
+            feedTable.Rows.Add(feedTableRow);
+            if (counter % 2 != 0)
+            {
+                feedTableRow.CssClass = "ms-alternating";
+            }
+            //first cell for feed icon
+            feedTableCell = new TableCell();
+            feedTableRow.Cells.Add(feedTableCell);
+
+            ///now the child table for data
+            childTable = new Table();
+            childTable.CellPadding = 5;
+            childRow = new TableRow();
+            childTable.Rows.Add(childRow);
+            feedTableCell.Controls.Add(childTable);
+
+
+            if (feed.Dictionary.ContainsKey("icon"))
+            {
+                Image image = new Image();
+                image.ImageUrl = feed.Dictionary["icon"].String;
+
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                childCell.Controls.Add(image);
+
+            }
+
+            if (feed.Dictionary.ContainsKey("created_time"))
+            {
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                childCell.Text = relativeTime(feed.Dictionary["created_time"].String.ToString());
+                childCell.Style.Add("color", "Gray");
+            }
+
+            return feedTable;
         }
     }
 }

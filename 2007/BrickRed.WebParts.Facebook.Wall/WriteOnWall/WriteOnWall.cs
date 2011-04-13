@@ -34,71 +34,55 @@ using System.Net;
 using System.IO;
 using System.ComponentModel;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace BrickRed.WebParts.Facebook.Wall
 {
     [Guid("e9aa91c6-b605-4ba0-bbac-7ae12d2bd58f")]
-    public class WriteOnWall : System.Web.UI.WebControls.WebParts.WebPart
+    public class WriteOnWall : System.Web.UI.WebControls.WebParts.WebPart,IWebEditable
     {
-        public WriteOnWall()
-        {
-        }
-
         Label LblMessage;
         TextBox textWall;
 
         #region Webpart Properties
-        [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-       DefaultValue(""),
-       WebDisplayName("Code"),
-       WebDescription("Please enter code")]
+
+        [WebBrowsable(false),
+       Personalizable(PersonalizationScope.Shared)]
 
         public string OAuthCode { get; set; }
 
-        [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-       DefaultValue(""),
-       WebDisplayName("Client ID"),
-       WebDescription("Please enter client id")]
-
+        [WebBrowsable(false),
+       Personalizable(PersonalizationScope.Shared)]
         public string OAuthClientID { get; set; }
 
-        [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-       DefaultValue(""),
-       WebDisplayName("Redirect Url"),
-       WebDescription("Please enter redirect url")]
-
+        [WebBrowsable(false),
+       Personalizable(PersonalizationScope.Shared)]
         public string OAuthRedirectUrl { get; set; }
 
-        [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-       DefaultValue(""),
-       WebDisplayName("Client Secret"),
-       WebDescription("Please enter client secret id")]
-
+        [WebBrowsable(false),
+       Personalizable(PersonalizationScope.Shared)]
         public string OAuthClientSecret { get; set; }
 
-
-        [WebBrowsable(true),
-        Category("Facebook Settings"),
-        Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-        WebDisplayName("Show User Name"),
-        WebDescription("Would you like to show user name")]
-
+        [WebBrowsable(false),
+       Personalizable(PersonalizationScope.Shared)]
         public bool EnableShowUserName { get; set; }
 
+        [WebBrowsable(false),
+      Personalizable(PersonalizationScope.Shared)]
+        public bool PostOnProfile { get; set; }
+
+        [WebBrowsable(false),
+      Personalizable(PersonalizationScope.Shared)]
+        public bool PostAsPage { get; set; }
+
+        [WebBrowsable(false),
+       Personalizable(PersonalizationScope.Shared)]
+        public string OAuthPageID { get; set; }
+
+
         #endregion
+
+        #region CreateChildControls event
 
         protected override void CreateChildControls()
         {
@@ -152,21 +136,38 @@ namespace BrickRed.WebParts.Facebook.Wall
             }
         }
 
+        #endregion
+
+        #region OnPreRender event
+
         protected override void OnPreRender(EventArgs e)
         {
+
             textWall.Text = "";
+
             if (this.EnableShowUserName)
-                textWall.Text = SPContext.Current.Web.CurrentUser.Name + " : ";
+            {
+                //if anonymous access is enabled,then don't show any user name
+                if (SPContext.Current.Web.CurrentUser != null)
+                {
+                    textWall.Text = SPContext.Current.Web.CurrentUser.Name + " : ";
+                }
+            }
         }
+
+        #endregion
+
+        #region 'Share' button click
 
         void buttonWriteOnWall_Click(object sender, EventArgs e)
         {
             try
             {
+
                 string oAuthToken;
 
                 string url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope=publish_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
-
+                
                 HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
@@ -175,14 +176,152 @@ namespace BrickRed.WebParts.Facebook.Wall
                     oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
                 }
 
-                url = string.Format("https://graph.facebook.com/me/feed?access_token={0}&message={1}", oAuthToken, textWall.Text.Trim());
+                string postUrl = string.Empty;
 
-                HttpWebRequest request2 = WebRequest.Create(url) as HttpWebRequest;
-                request2.Method = "post";
-                using (HttpWebResponse response2 = request2.GetResponse() as HttpWebResponse)
+                if (this.PostOnProfile)
                 {
-                    StreamReader reader = new StreamReader(response2.GetResponseStream());
+                    postUrl = string.Format("https://graph.facebook.com/me/feed?access_token={0}&message={1}", oAuthToken, textWall.Text.Trim());
+                }
+                else
+                {
+                    if (this.PostAsPage)
+                    {
+
+                        JSONObject me = GetUserPages(oAuthToken);
+
+                        if (me.Dictionary["data"] != null)
+                        {
+                            JSONObject[] userAccounts = me.Dictionary["data"].Array;
+
+                            if (userAccounts.Length > 0)
+                            {
+                                if (!userAccounts[0].Dictionary.ContainsKey("access_token"))
+                                {
+                                    LblMessage = new Label();
+                                    LblMessage.Text = "Manage pages permission has not been given to this application.In order for this application to post on your page as your page's account, you need to give this application 'Manage Pages' permission.Please go to the following url to grant this permission:" + string.Format("<a target='_blank' href='https://www.facebook.com/dialog/oauth?client_id={0}&redirect_uri={1}&scope=manage_pages&response_type=token'>https://www.facebook.com/dialog/oauth?client_id={0}&redirect_uri={1}&scope=manage_pages&response_type=token</a>", this.OAuthClientID, this.OAuthRedirectUrl);
+                                    this.Controls.Add(LblMessage);
+
+                                }
+                                else
+                                {
+
+                                    bool userAccountFound = false;
+
+                                    foreach (JSONObject userAccount in userAccounts)
+                                    {
+
+                                        if (userAccount.Dictionary["id"].String.Equals(this.OAuthPageID.Trim()))
+                                        {
+                                            userAccountFound = true;
+                                            postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID.Trim(), userAccount.Dictionary["access_token"].String, textWall.Text.Trim());
+                                            break;
+                                        }
+
+
+                                    }
+
+
+                                    if (!userAccountFound)
+                                    {
+                                        LblMessage = new Label();
+                                        LblMessage.Text = "The given page was not found in the list of pages.Please make sure that this user is the admin of the page that you have specified.";
+                                        this.Controls.Add(LblMessage);
+
+                                    }
+
+                                }
+
+                            }
+                            else
+                            {
+                                LblMessage = new Label();
+                                LblMessage.Text = "The given page was not found.";
+                                this.Controls.Add(LblMessage);
+                            }
+
+                        }
+                        else
+                        {
+                            LblMessage = new Label();
+                            LblMessage.Text = "No pages found for the given account.";
+                            this.Controls.Add(LblMessage);
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID, oAuthToken, textWall.Text.Trim());
+
+                    }
+
+                }
+
+
+                if (!String.IsNullOrEmpty(postUrl))
+                {
+
+                    HttpWebRequest request2 = WebRequest.Create(postUrl) as HttpWebRequest;
+                    request2.Method = "post";
+                    using (HttpWebResponse response2 = request2.GetResponse() as HttpWebResponse)
+                    {
+                        StreamReader reader = new StreamReader(response2.GetResponseStream());
+                        string retVal = reader.ReadToEnd();
+
+                        if (!String.IsNullOrEmpty(retVal))
+                        {
+                            LblMessage = new Label();
+                            if (this.PostOnProfile)
+                            {
+                                LblMessage.Text = "Message successfully posted on wall.";
+                            }
+                            else
+                            {
+                                LblMessage.Text = "Message successfully posted on page.";
+                            }
+
+                            this.Controls.Add(LblMessage);
+
+                        }
+                    }
+
+                }
+
+
+            }
+            catch (Exception Ex)
+            {
+                LblMessage = new Label();
+                LblMessage.Text = "An error occurred while posting on wall:" + Ex.Message;
+                this.Controls.Add(LblMessage);
+            }
+        }
+
+        #endregion
+    
+        #region Method to get user accounts(apps,pages etc.) for the given access token
+
+        private JSONObject GetUserPages(string oAuthToken)
+        {
+            JSONObject obj = null;
+            string url;
+            HttpWebRequest request;
+
+            try
+            {
+                url = string.Format("https://graph.facebook.com/me/accounts?access_token={0}", oAuthToken);
+                request = WebRequest.Create(url) as HttpWebRequest;
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                {
+                    StreamReader reader = new StreamReader(response.GetResponseStream());
                     string retVal = reader.ReadToEnd();
+
+                    obj = JSONObject.CreateFromString(retVal);
+                    if (obj.IsDictionary && obj.Dictionary.ContainsKey("error"))
+                    {
+                        throw new Exception(obj.Dictionary["error"].Dictionary["type"].String, new Exception(obj.Dictionary["error"].Dictionary["message"].String));
+                    }
                 }
             }
             catch (Exception Ex)
@@ -191,6 +330,26 @@ namespace BrickRed.WebParts.Facebook.Wall
                 LblMessage.Text = Ex.Message;
                 this.Controls.Add(LblMessage);
             }
+            return obj;
         }
+
+        #endregion
+
+        #region IWebEditable members
+
+        EditorPartCollection IWebEditable.CreateEditorParts()
+        {
+            EditorPartCollection defaultEditors = base.CreateEditorParts();
+            List<EditorPart> editors = new List<EditorPart>();
+            editors.Add(new WriteOnWallEditorPart(this.ID));
+            return new EditorPartCollection(defaultEditors, editors);
+        }
+
+        object IWebEditable.WebBrowsableObject
+        {
+            get { return this; }
+        }
+
+        #endregion
     }
 }
