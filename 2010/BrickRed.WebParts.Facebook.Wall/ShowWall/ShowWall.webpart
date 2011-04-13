@@ -8,7 +8,7 @@
     <data>
       <properties>
         <property name="Title" type="string">Facebook Wall</property>
-        <property name="Description" type="string">Shows Facebook feed for any give user id</property>
+        <property name="Description" type="string">Shows Facebook feed for any given user id</property>
       </properties>
     </data>
   </webPart>

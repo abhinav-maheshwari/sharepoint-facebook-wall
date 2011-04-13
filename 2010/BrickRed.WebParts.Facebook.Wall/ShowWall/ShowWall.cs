@@ -46,8 +46,8 @@ namespace BrickRed.WebParts.Facebook.Wall
        Personalizable(PersonalizationScope.Shared),
         WebPartStorage(Storage.Shared),
        DefaultValue(""),
-       WebDisplayName("User Id / User Name"),
-       WebDescription("Please enter user id")]
+       WebDisplayName("User Id / User Name / Page Id"),
+       WebDescription("Please enter User Id /User Name/page Id")]
 
         public string UserID { get; set; }
 

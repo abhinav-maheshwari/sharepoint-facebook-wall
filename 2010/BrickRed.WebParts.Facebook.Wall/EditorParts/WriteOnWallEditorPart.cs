@@ -52,7 +52,9 @@ namespace BrickRed.WebParts.Facebook.Wall
         private Panel pnlPropertyName;
         private Panel pnlPropertyControl;
         private HtmlGenericControl pnlPropertyPostAsWhat;
-
+        private Panel seperatorDiv;
+        private LiteralControl lineBreak;
+        private HtmlGenericControl paragraph; 
 
         public WriteOnWallEditorPart(string webPartID)
         {
@@ -71,10 +73,12 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             pnlPostToWallSettings = new Panel();
 
-            LiteralControl lineBreak = new LiteralControl("<br/>");
+            lineBreak = new LiteralControl("<br/>");
 
-            HtmlGenericControl paragraph; 
-
+            seperatorDiv = new Panel();
+            seperatorDiv.Attributes.Add("class", "UserDottedLine");
+            seperatorDiv.Attributes.Add("style", "width: 100%;");
+            
             //Code
             pnlProperty = new Panel();           
             pnlPropertyName = new Panel();
@@ -186,32 +190,45 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
-            pnlCommonSettings.Controls.Add(paragraph);
+            pnlCommonSettings.Controls.Add(paragraph);           
             pnlFacebookSettings.Controls.Add(pnlCommonSettings);
 
-            LiteralControl heading = new LiteralControl("Where would you like to post?");
-            pnlFacebookSettings.Controls.Add(heading);
-            LiteralControl hr = new LiteralControl("<hr style='color:black;height:1px'/>");
-            pnlFacebookSettings.Controls.Add(hr);
-            pnlFacebookSettings.Controls.Add(lineBreak);
-
+            seperatorDiv = new Panel();
+            seperatorDiv.Attributes.Add("class", "UserDottedLine");
+            seperatorDiv.Attributes.Add("style", "width: 100%;");
+            pnlFacebookSettings.Controls.Add(seperatorDiv);
+         
             //Post on your wall/page wall radio buttons
+                      
             pnlProperty = new Panel();
+            pnlPropertyName = new Panel();
+            pnlPropertyControl = new Panel();
 
-
-            //Post as this user/page radio buttons and page id text box
+            LiteralControl heading = new LiteralControl("Where would you like to post?");
+            pnlProperty.Controls.Add(heading);
+                      
             rdoBtnListPostLocation = new RadioButtonList();
             rdoBtnListPostLocation.Items.Add(new ListItem("On my wall", "postToYourWall"));
             rdoBtnListPostLocation.Items.Add(new ListItem("On my page", "postToPageWall"));
             rdoBtnListPostLocation.Items.FindByValue("postToYourWall").Selected = true;
-            rdoBtnListPostLocation.AutoPostBack = false;         
-                     
-            pnlProperty.Controls.Add(rdoBtnListPostLocation);
+            rdoBtnListPostLocation.AutoPostBack = false;
+            pnlPropertyControl.Controls.Add(rdoBtnListPostLocation);
+            pnlProperty.Controls.Add(pnlPropertyControl);
+
             pnlPostToWallSettings.Controls.Add(pnlProperty);
+
+           
+            //Post as this user/page radio buttons and page id text box
 
             pnlPropertyPostAsWhat = new HtmlGenericControl("div");
             pnlPropertyPostAsWhat.Attributes.Add("id", "postAsWhatDiv");
 
+            seperatorDiv = new Panel();
+            seperatorDiv.Attributes.Add("class", "UserDottedLine");
+            seperatorDiv.Attributes.Add("style", "width: 100%;");
+
+            pnlPropertyPostAsWhat.Controls.Add(seperatorDiv);
+       
             pnlPropertyName = new Panel();
             pnlPropertyControl = new Panel();
 
@@ -223,12 +240,12 @@ namespace BrickRed.WebParts.Facebook.Wall
             txtPageID = new TextBox();
             pnlPropertyControl.Controls.Add(txtPageID);
             pnlPropertyPostAsWhat.Controls.Add(pnlPropertyControl);
-
+          
             pnlPropertyPostAsWhat.Controls.Add(lineBreak);
+
             heading = new LiteralControl("Who should post the messages?");
             pnlPropertyPostAsWhat.Controls.Add(heading);
-            hr = new LiteralControl("<hr style='color:black;height:1px'/>");
-            pnlPropertyPostAsWhat.Controls.Add(hr);
+                    
             rdoBtnListPostAsWhat = new RadioButtonList();
             rdoBtnListPostAsWhat.Items.Add(new ListItem("Current User", "postAsThisUser"));
             rdoBtnListPostAsWhat.Items.Add(new ListItem("Current Page", "postAsPage"));
@@ -236,13 +253,18 @@ namespace BrickRed.WebParts.Facebook.Wall
             rdoBtnListPostAsWhat.AutoPostBack = false;
             pnlPropertyPostAsWhat.Controls.Add(rdoBtnListPostAsWhat);
 
-           
-            pnlPropertyPostAsWhat.Attributes.Add("style", "display:none");
+            seperatorDiv = new Panel();
+            seperatorDiv.Attributes.Add("class", "UserDottedLine");
+            seperatorDiv.Attributes.Add("style", "width: 100%;");
 
-            pnlPostToWallSettings.Controls.Add(pnlPropertyPostAsWhat);
+            pnlPropertyPostAsWhat.Controls.Add(seperatorDiv);
+
+            pnlPropertyPostAsWhat.Attributes.Add("style", "display:none;");
          
             pnlFacebookSettings.Controls.Add(pnlPostToWallSettings);
-
+         
+            pnlFacebookSettings.Controls.Add(pnlPropertyPostAsWhat);
+         
             this.Controls.Add(pnlFacebookSettings);
 
         }
