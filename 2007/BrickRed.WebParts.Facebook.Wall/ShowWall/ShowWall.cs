@@ -34,6 +34,9 @@ using System.ComponentModel;
 using System.Net;
 using System.Web.Script.Serialization;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
+using System.Collections.Generic;
 
 namespace BrickRed.WebParts.Facebook.Wall
 {
@@ -43,13 +46,56 @@ namespace BrickRed.WebParts.Facebook.Wall
         Label LblMessage;
 
         #region Webpart Properties
+
+
         [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
-        WebPartStorage(Storage.Shared),
-       DefaultValue(""),
-       WebDisplayName("User Id / User Name / Page Id"),
-       WebDescription("Please enter User Id /User Name/page Id")]
+     Category("Facebook Settings"),
+     Personalizable(PersonalizationScope.Shared),
+      WebPartStorage(Storage.Shared),
+     DefaultValue(""),
+     WebDisplayName("Code:"),
+     WebDescription("Please enter authorization code")]
+
+        public string OAuthCode { get; set; }
+
+        [WebBrowsable(true),
+   Category("Facebook Settings"),
+   Personalizable(PersonalizationScope.Shared),
+    WebPartStorage(Storage.Shared),
+   DefaultValue(""),
+   WebDisplayName("Client ID:"),
+   WebDescription("Please enter number of client id for application")]
+
+        public string OAuthClientID { get; set; }
+
+        [WebBrowsable(true),
+    Category("Facebook Settings"),
+    Personalizable(PersonalizationScope.Shared),
+     WebPartStorage(Storage.Shared),
+    DefaultValue(""),
+    WebDisplayName("Redirect Url:"),
+    WebDescription("Please enter redirect url")]
+
+        public string OAuthRedirectUrl { get; set; }
+
+        [WebBrowsable(true),
+     Category("Facebook Settings"),
+     Personalizable(PersonalizationScope.Shared),
+      WebPartStorage(Storage.Shared),
+     DefaultValue(""),
+     WebDisplayName("Client Secret:"),
+     WebDescription("Please enter client secret for application")]
+
+        public string OAuthClientSecret { get; set; }
+
+
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+         WebPartStorage(Storage.Shared),
+        DefaultValue(""),
+        WebDisplayName("User Id / User Name / Page Id"),
+        WebDescription("Please enter user id whose posts you want to display")]
 
         public string UserID { get; set; }
 
@@ -60,9 +106,12 @@ namespace BrickRed.WebParts.Facebook.Wall
         WebPartStorage(Storage.Shared),
        DefaultValue("10"),
        WebDisplayName("Wall Count"),
-       WebDescription("Please enter number of wall you want to display")]
+       WebDescription("Please enter no. of posts you want to display")]
+
 
         public int WallCount { get; set; }
+
+
 
         #endregion
 
@@ -180,18 +229,39 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             try
             {
-                url = string.Format("http://graph.facebook.com/{0}/feed", this.UserID);
+
+                url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope=read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+
+                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateFacebookCertificate);
+
                 request = WebRequest.Create(url) as HttpWebRequest;
+
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
                     StreamReader reader = new StreamReader(response.GetResponseStream());
                     string retVal = reader.ReadToEnd();
+                    oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
+                }
 
-                    obj = JSONObject.CreateFromString(retVal);
-                    if (obj.IsDictionary && obj.Dictionary.ContainsKey("error"))
+                if (!String.IsNullOrEmpty(oAuthToken))
+                {
+                    url = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}", this.UserID, oAuthToken);
+                    request = WebRequest.Create(url) as HttpWebRequest;
+                    using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                     {
-                        throw new Exception(obj.Dictionary["error"].Dictionary["type"].String, new Exception(obj.Dictionary["error"].Dictionary["message"].String));
+                        StreamReader reader = new StreamReader(response.GetResponseStream());
+                        string retVal = reader.ReadToEnd();
+
+                        obj = JSONObject.CreateFromString(retVal);
+                        if (obj.IsDictionary && obj.Dictionary.ContainsKey("error"))
+                        {
+                            throw new Exception(obj.Dictionary["error"].Dictionary["type"].String, new Exception(obj.Dictionary["error"].Dictionary["message"].String));
+                        }
                     }
+                }
+                else
+                {
+                    throw (new Exception("The access token returned was not valid."));
                 }
             }
             catch (Exception Ex)
@@ -356,5 +426,15 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             return feedTable;
         }
+
+
+        #region Method to validate facebook certificate
+
+        private static bool ValidateFacebookCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors policyErrors)
+        {
+            return true;
+        }
+
+        #endregion
     }
 }
