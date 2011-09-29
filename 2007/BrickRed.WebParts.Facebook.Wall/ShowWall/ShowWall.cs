@@ -42,96 +42,86 @@ namespace BrickRed.WebParts.Facebook.Wall
     [ToolboxItemAttribute(false)]
     public class ShowWall : Microsoft.SharePoint.WebPartPages.WebPart
     {
+        #region Public Controls
         Label LblMessage;
-        LinkButton lbtnPrevious = new LinkButton();
         LinkButton lbtnNext = new LinkButton();
         TableCell tcContent = new TableCell();
         TableCell tcpaging = new TableCell();
+        #endregion
+
         #region Webpart Properties
-
-
-        [WebBrowsable(true),
-     Category("Facebook Settings"),
-     Personalizable(PersonalizationScope.Shared),
-      WebPartStorage(Storage.Shared),
-     DefaultValue(""),
-     WebDisplayName("Code:"),
-     WebDescription("Please enter authorization code")]
-
-        public string OAuthCode { get; set; }
-
-        [WebBrowsable(true),
-   Category("Facebook Settings"),
-   Personalizable(PersonalizationScope.Shared),
-    WebPartStorage(Storage.Shared),
-   DefaultValue(""),
-   WebDisplayName("Client ID:"),
-   WebDescription("Please enter number of client id for application")]
-
-        public string OAuthClientID { get; set; }
-
-        [WebBrowsable(true),
-    Category("Facebook Settings"),
-    Personalizable(PersonalizationScope.Shared),
-     WebPartStorage(Storage.Shared),
-    DefaultValue(""),
-    WebDisplayName("Redirect Url:"),
-    WebDescription("Please enter redirect url")]
-
-        public string OAuthRedirectUrl { get; set; }
-
-        [WebBrowsable(true),
-     Category("Facebook Settings"),
-     Personalizable(PersonalizationScope.Shared),
-      WebPartStorage(Storage.Shared),
-     DefaultValue(""),
-     WebDisplayName("Client Secret:"),
-     WebDescription("Please enter client secret for application")]
-
-        public string OAuthClientSecret { get; set; }
-
 
         [WebBrowsable(true),
         Category("Facebook Settings"),
         Personalizable(PersonalizationScope.Shared),
-         WebPartStorage(Storage.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(""),
+        WebDisplayName("Code:"),
+        WebDescription("Please enter authorization code")]
+        public string OAuthCode { get; set; }
+
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(""),
+        WebDisplayName("Client ID:"),
+        WebDescription("Please enter number of client id for application")]
+        public string OAuthClientID { get; set; }
+
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(""),
+        WebDisplayName("Redirect Url:"),
+        WebDescription("Please enter redirect url")]
+        public string OAuthRedirectUrl { get; set; }
+
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(""),
+        WebDisplayName("Client Secret:"),
+        WebDescription("Please enter client secret for application")]
+        public string OAuthClientSecret { get; set; }
+
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
         DefaultValue(""),
         WebDisplayName("User Id / User Name / Page Id"),
         WebDescription("Please enter user id whose posts you want to display")]
-
         public string UserID { get; set; }
 
-
         [WebBrowsable(true),
-       Category("Facebook Settings"),
-       Personalizable(PersonalizationScope.Shared),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
         WebPartStorage(Storage.Shared),
-       DefaultValue("10"),
-       WebDisplayName("Initial Wall Count"),
-       WebDescription("Please enter no. of posts you want to display")]
-
-
+        DefaultValue(10),
+        WebDisplayName("Initial Wall Count"),
+        WebDescription("Please enter no. of posts you want to display")]
         public int WallCount { get; set; }
-        [WebBrowsable(true),
-         Category("Facebook Settings"),
-         Personalizable(PersonalizationScope.Shared),
-          WebPartStorage(Storage.Shared),
-         DefaultValue("true"),
-         WebDisplayName("Show my posts only"),
-         WebDescription("Please Check  if want to show only owners posts")]
 
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(true),
+        WebDisplayName("Show my posts only"),
+        WebDescription("Please Check  if want to show only owners posts")]
         public bool IsPosts { get; set; }
 
         [WebBrowsable(true),
         Category("Facebook Settings"),
         Personalizable(PersonalizationScope.Shared),
-         WebPartStorage(Storage.Shared),
-        DefaultValue("true"),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(true),
         WebDisplayName("Show User Image"),
         WebDescription("Please Check  if want to display the image of users")]
-
         public bool ShowUserImage { get; set; }
-
 
         #endregion
 
@@ -144,10 +134,33 @@ namespace BrickRed.WebParts.Facebook.Wall
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
-            withoutAjaxShow();
+            try
+            {
+                if (!String.IsNullOrEmpty(this.OAuthCode) ||
+                    !String.IsNullOrEmpty(this.OAuthClientID) ||
+                    !String.IsNullOrEmpty(this.OAuthRedirectUrl) ||
+                    !String.IsNullOrEmpty(this.OAuthClientSecret) ||
+                    !String.IsNullOrEmpty(this.UserID)
+                    )
+                {
+                    ShowPagedFeeds();
+                }
+                else
+                {
+                    LblMessage = new Label();
+                    LblMessage.Text = "Please set the values of facebook settings in webpart properties section in edit mode.";
+                    this.Controls.Add(LblMessage);
+                }
+            }
+            catch (Exception Ex)
+            {
+                LblMessage = new Label();
+                LblMessage.Text = Ex.Message;
+                this.Controls.Add(LblMessage);
+            }
         }
 
-        private void withoutAjaxShow()
+        private void ShowPagedFeeds()
         {
             Table pagingTable;
             TableRow trpaging = new TableRow();
@@ -173,7 +186,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             pagingTable.Controls.Add(trpaging);
             this.Controls.Add(Maintable);
             this.Controls.Add(pagingTable);
-        }   
+        }
 
         void lbtnNext_Click(object sender, EventArgs e)
         {
@@ -186,125 +199,103 @@ namespace BrickRed.WebParts.Facebook.Wall
                 tcpaging.Controls.Clear();
                 tcpaging.Controls.Add(ltrTxtMessage);
             }
-
         }
 
         private Table showFeeds(string FeedURL)
         {
             Table mainTable = null;
             int i = 0;
-            try
+
+            TableRow tr;
+            TableCell tc;
+            TableCell tcImage;
+            mainTable = new Table();
+            mainTable.Width = Unit.Percentage(100);
+            mainTable.CellSpacing = 0;
+            mainTable.CellPadding = 0;
+            mainTable.CssClass = "ms-viewlsts";
+            int feedsCount = 0;
+
+            JSONObject me = GetFeeds(FeedURL);
+
+            if (me.Dictionary["data"] != null)
             {
-
-
-                TableRow tr;
-                TableCell tc;
-                TableCell tcImage;
-                mainTable = new Table();
-                mainTable.Width = Unit.Percentage(100);
-                mainTable.CellSpacing = 0;
-                mainTable.CellPadding = 0;
-                mainTable.CssClass = "ms-viewlsts";
-                int feedsCount = 0;
-                if (!String.IsNullOrEmpty(this.UserID))
+                JSONObject[] feedsprev = new JSONObject[1];
+                JSONObject[] feeds = me.Dictionary["data"].Array;
+                feedsCount = feeds.Length;
+                if (ViewState["html"] != null)
                 {
-                    JSONObject me = GetFeeds(FeedURL);
-                    if (me.Dictionary["data"] != null)
+                    feedsprev = (JSONObject[])ViewState["html"] as JSONObject[];
+                }
+                int mergedarraylength = 0;
+                if (feeds != null)
+                {
+                    mergedarraylength = feeds.Length;
+                }
+                if (feedsprev[0] != null)
+                {
+                    mergedarraylength += feedsprev.Length;
+                }
+                JSONObject[] mergedFeeds = new JSONObject[mergedarraylength];
+
+                if (feedsprev[0] != null)
+                {
+                    feedsprev.CopyTo(mergedFeeds, 0);
+                }
+                if (feeds != null)
+                {
+                    if (feedsprev[0] != null)
                     {
-                        JSONObject[] feedsprev = new JSONObject[1];
-
-                        JSONObject[] feeds = me.Dictionary["data"].Array;
-                        feedsCount = feeds.Length;
-                        if (ViewState["html"] != null)
-                        {
-                            feedsprev = (JSONObject[])ViewState["html"] as JSONObject[];
-
-                        }
-                        int mergedarraylength = 0;
-                        if (feeds != null)
-                        {
-                            mergedarraylength = feeds.Length;
-                        }
-                        if (feedsprev[0] != null)
-                        {
-                            mergedarraylength += feedsprev.Length;
-                        }
-                        JSONObject[] mergedFeeds = new JSONObject[mergedarraylength];
-
-                        if (feedsprev[0] != null)
-                        {
-                            feedsprev.CopyTo(mergedFeeds, 0);
-                        }
-                        if (feeds != null)
-                        {
-                            if (feedsprev[0] != null)
-                            {
-                                feeds.CopyTo(mergedFeeds, feedsprev.Length);
-                            }
-                            else
-                            {
-                                feeds.CopyTo(mergedFeeds, 0);
-                            }
-                        }
-
-                        ViewState["html"] = mergedFeeds;
-                        foreach (JSONObject feed in mergedFeeds)
-                        {
-
-                            tr = new TableRow();
-
-                            if (i % 2 != 0)
-                            {
-                                tr.CssClass = "ms-alternatingstrong";
-                            }
-                            if (ShowUserImage)
-                            {
-                                tcImage = new TableCell();
-                                tcImage.CssClass = "ms-vb2";
-                                Image image = new Image();
-                                image.ImageUrl = "http://graph.facebook.com/" + feed.Dictionary["from"].Dictionary["id"].String + "/picture";
-                                tcImage.Controls.Add(image);
-                                tr.Cells.Add(tcImage);
-                            }
-                            tc = new TableCell();
-                            tc.CssClass = "ms-vb2";
-                            tc.Controls.Add(parseFeed(feed, i));
-                            tr.Cells.Add(tc);
-                            mainTable.Rows.Add(tr);
-
-                            i++;
-                        }
-
-                    }
-
-                    if (feedsCount < WallCount)
-                    {
-                        ViewState["next"] = "";
+                        feeds.CopyTo(mergedFeeds, feedsprev.Length);
                     }
                     else
                     {
-                        ViewState["next"] = me.Dictionary["paging"].Dictionary["next"].String;
+                        feeds.CopyTo(mergedFeeds, 0);
                     }
-                    ViewState["previous"] = me.Dictionary["paging"].Dictionary["previous"].String;
-
                 }
-                else
+
+                ViewState["html"] = mergedFeeds;
+                foreach (JSONObject feed in mergedFeeds)
                 {
-                    throw new Exception("User ID / User Name  missing in webpart properties.");
+
+                    tr = new TableRow();
+
+                    if (i % 2 != 0)
+                    {
+                        tr.CssClass = "ms-alternatingstrong";
+                    }
+                    if (ShowUserImage)
+                    {
+                        tcImage = new TableCell();
+                        tcImage.CssClass = "ms-vb2";
+                        Image image = new Image();
+                        image.ImageUrl = string.Format("https://graph.facebook.com/{0}/picture", feed.Dictionary["from"].Dictionary["id"].String);
+                        tcImage.Controls.Add(image);
+                        tr.Cells.Add(tcImage);
+                    }
+                    tc = new TableCell();
+                    tc.CssClass = "ms-vb2";
+                    tc.Controls.Add(ParseFeed(feed, i));
+                    tr.Cells.Add(tc);
+                    mainTable.Rows.Add(tr);
+
+                    i++;
                 }
-
             }
-            catch (Exception Ex)
+
+            if (feedsCount < WallCount)
             {
-                LblMessage = new Label();
-                LblMessage.Text = Ex.Message;
-                this.Controls.Add(LblMessage);
+                ViewState["next"] = "";
             }
-            return mainTable;
+            else
+            {
+                ViewState["next"] = me.Dictionary["paging"].Dictionary["next"].String;
+            }
 
+            return mainTable;
         }
 
-        private string relativeTime(string pastTime)
+        private string RelativeTime(string pastTime)
         {
             DateTime origStamp = DateTime.Parse(pastTime.ToString());
             DateTime curDate = DateTime.Now;
@@ -347,14 +338,13 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             try
             {
-
                 if (string.IsNullOrEmpty(FeedURL))
                 {
 
                     url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope=read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
 
+                    //get the server certificate for calling https 
                     ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateFacebookCertificate);
-
                     request = WebRequest.Create(url) as HttpWebRequest;
 
                     using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
@@ -368,10 +358,12 @@ namespace BrickRed.WebParts.Facebook.Wall
                     {
                         if (IsPosts)
                         {
+                            //if we need to show the user feeds only then call posts rest api
                             url = string.Format("https://graph.facebook.com/{0}/posts?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
                         }
                         else
                         {
+                            //else we need to call the feed rest api
                             url = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
                         }
                     }
@@ -383,8 +375,11 @@ namespace BrickRed.WebParts.Facebook.Wall
                 }
                 else
                 {
+                    //this is the url that we got for next feed url...no need to generate the url from scratch
                     url = FeedURL;
                 }
+
+                //now send the request to facebook
                 request = WebRequest.Create(url) as HttpWebRequest;
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
@@ -410,7 +405,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             return obj;
         }
 
-        private Table parseFeed(JSONObject feed, int counter)
+        private Table ParseFeed(JSONObject feed, int counter)
         {
             Table feedTable;
             TableRow feedTableRow;
@@ -427,7 +422,6 @@ namespace BrickRed.WebParts.Facebook.Wall
 
 
             //first of all see what is the type of this feed
-
             switch (feed.Dictionary["type"].String)
             {
                 case "status":
@@ -470,9 +464,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                         childCell.RowSpan = 4;
                         childRow.Cells.Add(childCell);
                         childCell.Controls.Add(image);
-
                     }
-
 
                     if (feed.Dictionary.ContainsKey("name"))
                     {
@@ -502,8 +494,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                         childCell.Text = feed.Dictionary["message"].String;
                         childRow.Cells.Add(childCell);
                     }
-
-
 
 
                     if (feed.Dictionary.ContainsKey("description"))
@@ -557,7 +547,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             {
                 childCell = new TableCell();
                 childRow.Cells.Add(childCell);
-                childCell.Text = relativeTime(feed.Dictionary["created_time"].String.ToString());
+                childCell.Text = RelativeTime(feed.Dictionary["created_time"].String.ToString());
                 childCell.Style.Add("color", "Gray");
             }
 
