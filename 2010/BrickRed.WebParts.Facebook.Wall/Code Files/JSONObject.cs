@@ -34,6 +34,8 @@ namespace BrickRed.WebParts.Facebook.Wall
     /// mapping strings to other objects, an array of objects, or a single 
     /// object, which represents a scalar.
     /// </summary>
+    /// 
+    [Serializable]
     public class JSONObject
     {
         /// <summary>

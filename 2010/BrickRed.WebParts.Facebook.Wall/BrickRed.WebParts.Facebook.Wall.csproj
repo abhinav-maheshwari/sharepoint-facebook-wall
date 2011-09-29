@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code Files\JSONObject.cs" />
+    <Compile Include="Code Files\ProgressTemplate.cs" />
     <Compile Include="EditorParts\WriteOnWallEditorPart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowWall\ShowWall.cs" />
@@ -76,7 +77,9 @@
     <None Include="ShowWall\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{df133226-daef-4cde-ae6e-387466f6599d}</SharePointProjectItemId>
     </None>
-    <None Include="ShowWall\ShowWall.webpart" />
+    <None Include="ShowWall\ShowWall.webpart">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="WriteOnWall\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{f463a218-0c2f-423b-8be8-066edcf3c7c3}</SharePointProjectItemId>
     </None>
@@ -88,7 +91,9 @@
       <DependentUpon>Feature.feature</DependentUpon>
     </Content>
     <Content Include="Images\BrickRed\BrickRedFeatureLogo.png" />
-    <Content Include="ShowWall\Elements.xml" />
+    <Content Include="ShowWall\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="WriteOnWall\Elements.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
