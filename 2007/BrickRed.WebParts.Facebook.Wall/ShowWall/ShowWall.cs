@@ -49,6 +49,15 @@ namespace BrickRed.WebParts.Facebook.Wall
         TableCell tcpaging = new TableCell();
         #endregion
 
+        #region Check for the Posts User want to see
+        protected FeedType _feedtype;
+        public enum FeedType
+        {
+            Users = 0,
+            Group = 1
+        }
+        #endregion
+
         #region Webpart Properties
 
         [WebBrowsable(true),
@@ -87,12 +96,26 @@ namespace BrickRed.WebParts.Facebook.Wall
         WebDescription("Please enter client secret for application")]
         public string OAuthClientSecret { get; set; }
 
+        //Check for the User Posts (User/Group)
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(true),
+        WebDisplayName("Posts"),
+        WebDescription("Please select the posts you want to see from")]
+        public FeedType UserFeedType
+        {
+            get { return _feedtype; }
+            set { _feedtype = value; }
+        }
+
         [WebBrowsable(true),
         Category("Facebook Settings"),
         Personalizable(PersonalizationScope.Shared),
         WebPartStorage(Storage.Shared),
         DefaultValue(""),
-        WebDisplayName("User Id / User Name / Page Id"),
+        WebDisplayName("User Id / User Name / Page Id / Group Id"),
         WebDescription("Please enter user id whose posts you want to display")]
         public string UserID { get; set; }
 
@@ -356,14 +379,23 @@ namespace BrickRed.WebParts.Facebook.Wall
 
                     if (!String.IsNullOrEmpty(oAuthToken))
                     {
-                        if (IsPosts)
+                        //If User wants to see the Posts from the users wall
+                        if (UserFeedType.Equals(FeedType.Users))
                         {
-                            //if we need to show the user feeds only then call posts rest api
-                            url = string.Format("https://graph.facebook.com/{0}/posts?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
+                            if (IsPosts)
+                            {
+                                //if we need to show the user feeds only then call posts rest api
+                                url = string.Format("https://graph.facebook.com/{0}/posts?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
+                            }
+                            else
+                            {
+                                //else we need to call the feed rest api
+                                url = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
+                            }
                         }
+                        //If the user wants to the posts from the Group wall
                         else
                         {
-                            //else we need to call the feed rest api
                             url = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
                         }
                     }

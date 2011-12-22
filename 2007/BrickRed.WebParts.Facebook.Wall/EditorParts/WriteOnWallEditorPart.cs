@@ -209,6 +209,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             rdoBtnListPostLocation = new RadioButtonList();
             rdoBtnListPostLocation.Items.Add(new ListItem("On my wall", "postToYourWall"));
             rdoBtnListPostLocation.Items.Add(new ListItem("On my page", "postToPageWall"));
+            rdoBtnListPostLocation.Items.Add(new ListItem("On my group", "postToGroupWall"));
             rdoBtnListPostLocation.Items.FindByValue("postToYourWall").Selected = true;
             rdoBtnListPostLocation.AutoPostBack = false;
             pnlPropertyControl.Controls.Add(rdoBtnListPostLocation);
@@ -232,7 +233,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             pnlPropertyControl = new Panel();
 
             Label lblPageID = new Label();
-            lblPageID.Text = "Page ID:<br/><br/>";
+            lblPageID.Text = "Page ID / Group ID:<br/><br/>";
             pnlPropertyName.Controls.Add(lblPageID);
             pnlPropertyPostAsWhat.Controls.Add(pnlPropertyName);
 
@@ -249,6 +250,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             rdoBtnListPostAsWhat.Items.Add(new ListItem("Current User", "postAsThisUser"));
             rdoBtnListPostAsWhat.Items.Add(new ListItem("Current Page", "postAsPage"));
             rdoBtnListPostAsWhat.Items[0].Selected = true;
+            rdoBtnListPostAsWhat.Items.FindByValue("postAsPage").Attributes.Add("ID", "rdoPostAsPage");
             rdoBtnListPostAsWhat.AutoPostBack = false;
             pnlPropertyPostAsWhat.Controls.Add(rdoBtnListPostAsWhat);
 
@@ -296,8 +298,15 @@ namespace BrickRed.WebParts.Facebook.Wall
                 //check if posting to your wall or page's wall
                 if (rdoBtnListPostLocation.SelectedItem.Value.Equals("postToYourWall"))
                 {
-                    webPart.PostOnProfile = true;                 
+                    webPart.PostOnProfile = true;
+                    webPart.PostOnGroupWall = false;
                     pnlPropertyPostAsWhat.Attributes["style"] = "display:none";
+                }
+                else if (rdoBtnListPostLocation.SelectedItem.Value.Equals("postToGroupWall"))
+                {
+                    webPart.PostOnProfile = false;
+                    webPart.PostOnGroupWall = true;
+                    pnlPropertyPostAsWhat.Attributes["style"] = "display:block";
                 }
                 else
                 {
@@ -308,10 +317,18 @@ namespace BrickRed.WebParts.Facebook.Wall
                 //setting facebook page id given by the user
                 webPart.OAuthPageID = txtPageID.Text;
 
-                //check if posting as this user or as page
-                if (rdoBtnListPostAsWhat.SelectedItem.Value.Equals("postAsPage"))
+                //Post as Current User if the post is to be posted at the Groups wall
+                if (!webPart.PostOnGroupWall)
                 {
-                    webPart.PostAsPage = true;
+                    //check if posting as this user or as page
+                    if (rdoBtnListPostAsWhat.SelectedItem.Value.Equals("postAsPage"))
+                    {
+                        webPart.PostAsPage = true;
+                    }
+                    else
+                    {
+                        webPart.PostAsPage = false;
+                    }
                 }
                 else
                 {
@@ -343,6 +360,11 @@ namespace BrickRed.WebParts.Facebook.Wall
                     {
                         rdoBtnListPostLocation.Items.FindByValue("postToYourWall").Selected = true;                      
                         pnlPropertyPostAsWhat.Attributes["style"] = "display:none";
+                    }
+                    else if (webPart.PostOnGroupWall)
+                    {
+                        rdoBtnListPostLocation.Items.FindByValue("postToGroupWall").Selected = true;
+                        pnlPropertyPostAsWhat.Attributes["style"] = "display:block";
                     }
                     else
                     {
@@ -376,10 +398,16 @@ namespace BrickRed.WebParts.Facebook.Wall
                                                            if(radiobuttonlistitemvalue=='postToPageWall')
                                                               {
                                                                  document.getElementById(divid).style.display='block';
+                                                                 document.getElementById('rdoPostAsPage').style.display='block';
                                                                }
-                                                            else
+                                                            else if(radiobuttonlistitemvalue=='postToYourWall')
                                                               {
                                                                  document.getElementById(divid).style.display='none';   
+                                                              }
+                                                            else
+                                                              {
+                                                                 document.getElementById(divid).style.display='block';                                                                 
+                                                                 document.getElementById('rdoPostAsPage').style.display='none';
                                                               }
                                                              
                                                         }
