@@ -50,17 +50,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EditorParts\WriteOnWallEditorPart.cs" />
+    <Compile Include="Enumerators.cs" />
     <Compile Include="JSONObject.cs" />
+    <Compile Include="LikeBox\LikeBox.cs" />
+    <Compile Include="LikeButton\LikeButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowWall\ShowWall.cs" />
     <Compile Include="WriteOnWall\WriteOnWall.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="LikeBox\LikeBox.webpart" />
+    <None Include="LikeButton\LikeButton.webpart" />
     <None Include="Properties\BrickRed.WebParts.Facebook.Wall.snk" />
     <None Include="ShowWall\ShowWall.webpart" />
     <None Include="WriteOnWall\WriteOnWall.webpart" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="LikeBox\LikeBox.xml" />
+    <Content Include="LikeButton\LikeButton.xml" />
     <Content Include="ShowWall\ShowWall.xml" />
     <Content Include="WriteOnWall\WriteOnWall.xml" />
   </ItemGroup>

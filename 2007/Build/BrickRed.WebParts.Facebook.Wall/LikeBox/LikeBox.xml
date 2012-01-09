@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements Id="178a30f3-da25-40b9-8c5e-35fc7518d5c5" xmlns="http://schemas.microsoft.com/sharepoint/" >
+  <Module Name="WebParts" List="113" Url="_catalogs/wp">
+    <File Path="LikeBox\LikeBox.webpart" Url="LikeBox.webpart" Type="GhostableInLibrary" >
+      <Property Name="Group" Value="BrickRed"></Property>
+    </File>
+  </Module>
+</Elements>

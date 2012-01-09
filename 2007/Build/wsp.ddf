@@ -18,4 +18,9 @@ BrickRed.WebParts.Facebook.Wall\WriteOnWall\WriteOnWall.webpart BrickRed.WebPart
 BrickRed.WebParts.Facebook.Wall\WriteOnWall\WriteOnWall.xml BrickRed.WebParts.Facebook.Wall\WriteOnWall\WriteOnWall.xml
 
 
+BrickRed.WebParts.Facebook.Wall\LikeBox\LikeBox.webpart BrickRed.WebParts.Facebook.Wall\LikeBox\LikeBox.webpart
+BrickRed.WebParts.Facebook.Wall\LikeBox\LikeBox.xml BrickRed.WebParts.Facebook.Wall\LikeBox\LikeBox.xml
 
+
+BrickRed.WebParts.Facebook.Wall\LikeButton\LikeButton.webpart BrickRed.WebParts.Facebook.Wall\LikeButton\LikeButton.webpart
+BrickRed.WebParts.Facebook.Wall\LikeButton\LikeButton.xml BrickRed.WebParts.Facebook.Wall\LikeButton\LikeButton.xml
