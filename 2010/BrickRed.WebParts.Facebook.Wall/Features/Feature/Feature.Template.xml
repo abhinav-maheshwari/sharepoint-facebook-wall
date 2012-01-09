@@ -4,5 +4,9 @@
     <ElementFile Location="ShowWall\ShowWall.webpart" />
     <ElementManifest Location="WriteOnWall\Elements.xml" />
     <ElementFile Location="WriteOnWall\WriteOnWall.webpart" />
+    <ElementManifest Location="LikeBox\Elements.xml" />
+    <ElementFile Location="LikeBox\LikeBox.webpart" />
+    <ElementManifest Location="LikeButton\Elements.xml" />
+    <ElementFile Location="LikeButton\LikeButton.webpart" />
   </ElementManifests>
 </Feature>

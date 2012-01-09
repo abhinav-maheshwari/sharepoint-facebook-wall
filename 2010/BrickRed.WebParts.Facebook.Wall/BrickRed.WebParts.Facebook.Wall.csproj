@@ -53,9 +53,12 @@
     <Reference Include="Microsoft.SharePoint.Security" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code Files\Enumerators.cs" />
     <Compile Include="Code Files\JSONObject.cs" />
     <Compile Include="Code Files\ProgressTemplate.cs" />
     <Compile Include="EditorParts\WriteOnWallEditorPart.cs" />
+    <Compile Include="LikeBox\LikeBox.cs" />
+    <Compile Include="LikeButton\LikeButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowWall\ShowWall.cs" />
     <Compile Include="WriteOnWall\WriteOnWall.cs" />
@@ -68,6 +71,14 @@
       <SharePointProjectItemId>{21949790-61be-46f6-ac3e-c273e27e8ed4}</SharePointProjectItemId>
     </None>
     <None Include="key.snk" />
+    <None Include="LikeBox\LikeBox.webpart" />
+    <None Include="LikeBox\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{db1e7c12-5074-4824-82a2-1fad15515e0e}</SharePointProjectItemId>
+    </None>
+    <None Include="LikeButton\LikeButton.webpart" />
+    <None Include="LikeButton\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{2d6232c7-b8e1-47eb-836d-6ffc29f02565}</SharePointProjectItemId>
+    </None>
     <None Include="Package\Package.package">
       <PackageId>{25853faf-d7b8-4be2-8e38-4187a3b35ecb}</PackageId>
     </None>
@@ -89,8 +100,11 @@
   <ItemGroup>
     <Content Include="Features\Feature\Feature.Template.xml">
       <DependentUpon>Feature.feature</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Images\BrickRed\BrickRedFeatureLogo.png" />
+    <Content Include="LikeBox\Elements.xml" />
+    <Content Include="LikeButton\Elements.xml" />
     <Content Include="ShowWall\Elements.xml">
       <SubType>Designer</SubType>
     </Content>
