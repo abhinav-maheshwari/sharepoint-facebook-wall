@@ -53,27 +53,25 @@ namespace BrickRed.WebParts.Facebook.Wall
         private HtmlGenericControl pnlPropertyPostAsWhat;
         private Panel seperatorDiv;
         private LiteralControl lineBreak;
-        private HtmlGenericControl paragraph; 
+        private HtmlGenericControl paragraph;
+
+        private TextBox txtUserID;
+        private CheckBox chkShowHeader;
+        private CheckBox chkShowHeaderImage;
 
         public WriteOnWallEditorPart(string webPartID)
         {
             this.ID = "WriteOnWallEditorPart" + webPartID;
             this.Title = "Facebook Settings";
-
         }
 
         protected override void CreateChildControls() 
         { 
             base.CreateChildControls();
-
             pnlFacebookSettings = new Panel();
-
             pnlCommonSettings = new Panel();
-
             pnlPostToWallSettings = new Panel();
-
             lineBreak = new LiteralControl("<br/>");
-
             seperatorDiv = new Panel();
             seperatorDiv.Attributes.Add("class", "UserDottedLine");
             seperatorDiv.Attributes.Add("style", "width: 100%;");
@@ -97,7 +95,6 @@ namespace BrickRed.WebParts.Facebook.Wall
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
-           
 
             //Client ID
             pnlProperty = new Panel();
@@ -114,12 +111,9 @@ namespace BrickRed.WebParts.Facebook.Wall
             pnlPropertyControl.Controls.Add(txtAuthClientID);
             pnlProperty.Controls.Add(pnlPropertyControl);
 
-
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
-
-           
 
             //Redirect Url
             pnlProperty = new Panel();
@@ -140,7 +134,6 @@ namespace BrickRed.WebParts.Facebook.Wall
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
-           
 
             //Client Secret
             pnlProperty = new Panel();
@@ -160,10 +153,67 @@ namespace BrickRed.WebParts.Facebook.Wall
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
-           
+
+            //User ID
+            pnlProperty = new Panel();
+            pnlPropertyName = new Panel();
+            pnlPropertyControl = new Panel();
+
+            lblProperty = new Label();
+            lblProperty.Text = "User Id / User Name / Page Id:<br/><br/>";
+            pnlPropertyName.Controls.Add(lblProperty);
+            pnlProperty.Controls.Add(pnlPropertyName);
+
+            txtUserID = new TextBox();
+            txtUserID.Width = Unit.Percentage(100);
+            pnlPropertyControl.Controls.Add(txtUserID);
+            pnlProperty.Controls.Add(pnlPropertyControl);
+
+            paragraph = new HtmlGenericControl("p");
+            paragraph.Controls.Add(pnlProperty);
+            pnlCommonSettings.Controls.Add(paragraph);
+
+            //Show Header 
+            pnlProperty = new Panel();
+            pnlPropertyName = new Panel();
+            pnlPropertyControl = new Panel();
+
+            lblProperty = new Label();
+            lblProperty.Text = "Show header:";
+            pnlPropertyName.Controls.Add(lblProperty);
+            pnlProperty.Controls.Add(pnlPropertyName);
+
+            chkShowHeader = new CheckBox();
+            chkShowHeader.Checked = false;
+            chkShowHeader.AutoPostBack = false;
+            pnlPropertyControl.Controls.Add(chkShowHeader);
+            pnlProperty.Controls.Add(pnlPropertyControl);
+
+            paragraph = new HtmlGenericControl("p");
+            paragraph.Controls.Add(pnlProperty);
+            pnlCommonSettings.Controls.Add(paragraph);
+
+            //Show Header Image 
+            pnlProperty = new Panel();
+            pnlPropertyName = new Panel();
+            pnlPropertyControl = new Panel();
+
+            lblProperty = new Label();
+            lblProperty.Text = "Show header image:";
+            pnlPropertyName.Controls.Add(lblProperty);
+            pnlProperty.Controls.Add(pnlPropertyName);
+
+            chkShowHeaderImage = new CheckBox();
+            chkShowHeaderImage.Checked = false;
+            chkShowHeaderImage.AutoPostBack = false;
+            pnlPropertyControl.Controls.Add(chkShowHeaderImage);
+            pnlProperty.Controls.Add(pnlPropertyControl);
+
+            paragraph = new HtmlGenericControl("p");
+            paragraph.Controls.Add(pnlProperty);
+            pnlCommonSettings.Controls.Add(paragraph);
 
             //Show user name 
-           
             pnlProperty = new Panel();
             pnlPropertyName = new Panel();
             pnlPropertyControl = new Panel();
@@ -178,7 +228,6 @@ namespace BrickRed.WebParts.Facebook.Wall
             chkShowUserName.AutoPostBack = false;
             pnlPropertyControl.Controls.Add(chkShowUserName);
             pnlProperty.Controls.Add(pnlPropertyControl);
-           
 
             //check for anonymous access, if it is enabled, don't show current user name as it will be null
             if (SPContext.Current.Web.CurrentUser == null)
@@ -216,10 +265,8 @@ namespace BrickRed.WebParts.Facebook.Wall
             pnlProperty.Controls.Add(pnlPropertyControl);
 
             pnlPostToWallSettings.Controls.Add(pnlProperty);
-
            
             //Post as this user/page radio buttons and page id text box
-
             pnlPropertyPostAsWhat = new HtmlGenericControl("div");
             pnlPropertyPostAsWhat.Attributes.Add("id", "postAsWhatDiv");
 
@@ -259,33 +306,29 @@ namespace BrickRed.WebParts.Facebook.Wall
             seperatorDiv.Attributes.Add("style", "width: 100%;");
 
             pnlPropertyPostAsWhat.Controls.Add(seperatorDiv);
-
             pnlPropertyPostAsWhat.Attributes.Add("style", "display:none;");
-         
             pnlFacebookSettings.Controls.Add(pnlPostToWallSettings);
-         
             pnlFacebookSettings.Controls.Add(pnlPropertyPostAsWhat);
-         
-            this.Controls.Add(pnlFacebookSettings);
 
+            this.Controls.Add(pnlFacebookSettings);
         }
 
        
         public override bool ApplyChanges() 
         { 
             EnsureChildControls();
-
             WriteOnWall webPart = WebPartToEdit as WriteOnWall; 
-
             if (webPart != null) 
             { 
                 webPart.OAuthCode = txtAuthCode.Text;
                 webPart.OAuthClientID = txtAuthClientID.Text;
                 webPart.OAuthClientSecret = txtAuthClientSecret.Text;
                 webPart.OAuthRedirectUrl = txtAuthRedirectUrl.Text;
+                webPart.UserID = txtUserID.Text.Trim();
+                webPart.ShowHeader = chkShowHeader.Checked ? true : false;
+                webPart.ShowHeaderImage = chkShowHeaderImage.Checked ? true : false;
 
                 //checking for sites with anonymous access and setting show user name property
-
                 if (chkShowUserName.Visible)
                 {
                     webPart.EnableShowUserName = chkShowUserName.Checked;
@@ -335,7 +378,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                     webPart.PostAsPage = false;
                 }
             }
- 
             return true; 
         }         
         
@@ -372,7 +414,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                         pnlPropertyPostAsWhat.Attributes["style"] = "display:block";
                     }
 
-
                     txtPageID.Text = webPart.OAuthPageID;
 
                     if (webPart.PostAsPage)
@@ -383,7 +424,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                     {
                         rdoBtnListPostAsWhat.Items.FindByValue("postAsThisUser").Selected = true;
                     }
-               
                }
         }
 
@@ -414,7 +454,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                                                     </script>";
 
             this.Page.ClientScript.RegisterStartupScript(this.GetType(), "scriptShowHidePostAsWhatDiv", scriptShowHidePostAsWhatDiv);
-
             foreach (ListItem item in rdoBtnListPostLocation.Items)
             {               
                 item.Attributes.Add("onclick", "ShowHidePostAsWhatDiv('" + item.Value + "','postAsWhatDiv');");               
@@ -426,6 +465,5 @@ namespace BrickRed.WebParts.Facebook.Wall
             base.Render(output);
           
         } 
-
     }
 }

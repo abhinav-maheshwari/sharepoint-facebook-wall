@@ -49,6 +49,7 @@
     <Reference Include="Microsoft.SharePoint" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonHelper.cs" />
     <Compile Include="EditorParts\WriteOnWallEditorPart.cs" />
     <Compile Include="Enumerators.cs" />
     <Compile Include="JSONObject.cs" />
@@ -66,6 +67,7 @@
     <None Include="WriteOnWall\WriteOnWall.webpart" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Layouts\BrickRed.WebParts.Facebook.Wall\Style.css" />
     <Content Include="LikeBox\LikeBox.xml" />
     <Content Include="LikeButton\LikeButton.xml" />
     <Content Include="ShowWall\ShowWall.xml" />

@@ -83,6 +83,17 @@ namespace BrickRed.WebParts.Facebook.Wall
        Personalizable(PersonalizationScope.Shared)]
         public string OAuthPageID { get; set; }
 
+        [WebBrowsable(false),
+      Personalizable(PersonalizationScope.Shared)]
+        public string UserID { get; set; }
+
+        [WebBrowsable(false),
+      Personalizable(PersonalizationScope.Shared)]
+        public bool ShowHeader { get; set; }
+
+        [WebBrowsable(false),
+      Personalizable(PersonalizationScope.Shared)]
+        public bool ShowHeaderImage { get; set; }
 
         #endregion
 
@@ -90,52 +101,77 @@ namespace BrickRed.WebParts.Facebook.Wall
 
         protected override void CreateChildControls()
         {
-            base.CreateChildControls();
-            try
+            if (!String.IsNullOrEmpty(this.OAuthCode) ||
+                   !String.IsNullOrEmpty(this.OAuthClientID) ||
+                   !String.IsNullOrEmpty(this.OAuthRedirectUrl) ||
+                   !String.IsNullOrEmpty(this.OAuthClientSecret) ||
+                   !String.IsNullOrEmpty(this.UserID)
+                   )
             {
-                Table mainTable;
-                TableRow tr;
-                TableCell tc;
+                this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
 
-                Button buttonWriteOnWall;
+                base.CreateChildControls();
+                try
+                {
+                    Table mainTable;
+                    TableRow tr;
+                    TableCell tc;
 
-                mainTable = new Table();
-                mainTable.Width = Unit.Percentage(100);
-                mainTable.CellSpacing = 5;
-                mainTable.CellPadding = 0;
+                    Button buttonWriteOnWall;
 
-                this.Controls.Add(mainTable);
+                    mainTable = new Table();
+                    mainTable.Width = Unit.Percentage(100);
+                    mainTable.CellSpacing = 0;
+                    mainTable.CellPadding = 0;
 
-                tr = new TableRow();
-                mainTable.Rows.Add(tr);
-                tc = new TableCell();
-                tc.Width = Unit.Percentage(30);
-                tr.Cells.Add(tc);
-                textWall = new TextBox();
-                textWall.TextMode = TextBoxMode.MultiLine;
-                textWall.MaxLength = 140;
-                textWall.Width = Unit.Percentage(100);
-                textWall.Height = Unit.Pixel(100);
-                tc.Controls.Add(textWall);
+                    this.Controls.Add(mainTable);
 
-                tr = new TableRow();
-                mainTable.Rows.Add(tr);
-                tc = new TableCell();
-                tc.HorizontalAlign = HorizontalAlign.Right;
-                tc.Width = Unit.Percentage(30);
-                tr.Cells.Add(tc);
-                buttonWriteOnWall = new Button();
-                buttonWriteOnWall.ForeColor = Color.White;
-                buttonWriteOnWall.BackColor = Color.FromArgb(84, 116, 186);
-                buttonWriteOnWall.Text = "Share";
-                buttonWriteOnWall.Click += new EventHandler(buttonWriteOnWall_Click);
-                tc.Controls.Add(buttonWriteOnWall);
+                    //Create the header
+                    if (this.ShowHeader)
+                    {
+                        tr = new TableRow();
+                        mainTable.Rows.Add(tr);
+                        tc = new TableCell();
+                        tr.Cells.Add(tc);
+                        tc.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.ShowHeaderImage));
+                        tc.CssClass = "fbHeaderTitleBranded";
+                    }
 
+                    tr = new TableRow();
+                    mainTable.Rows.Add(tr);
+                    tc = new TableCell();
+                    tc.Width = Unit.Percentage(30);
+                    tr.Cells.Add(tc);
+                    textWall = new TextBox();
+                    textWall.TextMode = TextBoxMode.MultiLine;
+                    textWall.MaxLength = 140;
+                    textWall.CssClass = "fbTextBox";
+                    tc.Controls.Add(textWall);
+
+                    tr = new TableRow();
+                    mainTable.Rows.Add(tr);
+                    tc = new TableCell();
+                    tc.HorizontalAlign = HorizontalAlign.Right;
+                    tc.Width = Unit.Percentage(30);
+                    tr.Cells.Add(tc);
+                    buttonWriteOnWall = new Button();
+                    buttonWriteOnWall.ForeColor = Color.White;
+                    buttonWriteOnWall.BackColor = Color.FromArgb(84, 116, 186);
+                    buttonWriteOnWall.Text = "Share";
+                    buttonWriteOnWall.Click += new EventHandler(buttonWriteOnWall_Click);
+                    tc.Controls.Add(buttonWriteOnWall);
+                }
+                catch (Exception Ex)
+                {
+                    LblMessage = new Label();
+                    LblMessage.Text = Ex.Message;
+                    this.Controls.Add(LblMessage);
+                }
             }
-            catch (Exception Ex)
+            else
             {
                 LblMessage = new Label();
-                LblMessage.Text = Ex.Message;
+                LblMessage.Text = "Please set the values of facebook settings in webpart properties section in edit mode.";
                 this.Controls.Add(LblMessage);
             }
         }
@@ -146,15 +182,16 @@ namespace BrickRed.WebParts.Facebook.Wall
 
         protected override void OnPreRender(EventArgs e)
         {
-
-            textWall.Text = "";
-
-            if (this.EnableShowUserName)
+            if (textWall != null)
             {
-                //if anonymous access is enabled,then don't show any user name
-                if (SPContext.Current.Web.CurrentUser != null)
+                textWall.Text = string.Empty;
+                if (this.EnableShowUserName)
                 {
-                    textWall.Text = SPContext.Current.Web.CurrentUser.Name + " : ";
+                    //if anonymous access is enabled,then don't show any user name
+                    if (SPContext.Current.Web.CurrentUser != null)
+                    {
+                        textWall.Text = SPContext.Current.Web.CurrentUser.Name + " : ";
+                    }
                 }
             }
         }
