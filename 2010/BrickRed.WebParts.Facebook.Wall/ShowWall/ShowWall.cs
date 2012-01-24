@@ -35,6 +35,8 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Text;
 
 
 namespace BrickRed.WebParts.Facebook.Wall
@@ -118,11 +120,28 @@ namespace BrickRed.WebParts.Facebook.Wall
         Category("Facebook Settings"),
         Personalizable(PersonalizationScope.Shared),
         WebPartStorage(Storage.Shared),
-        DefaultValue(true),
+        DefaultValue(false),
         WebDisplayName("Show User Image"),
         WebDescription("Please Check  if want to display the image of users")]
         public bool ShowUserImage { get; set; }
 
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(true),
+        WebDisplayName("Show header"),
+        WebDescription("Would you like to show header")]
+        public bool ShowHeader { get; set; }
+
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(false),
+        WebDisplayName("Show header image"),
+        WebDescription("Would you like to Show Header Image")]
+        public bool ShowHeaderImage { get; set; }
         #endregion
 
         protected override void OnInit(EventArgs e)
@@ -143,6 +162,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                     !String.IsNullOrEmpty(this.UserID)
                     )
                 {
+                    this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
                     ShowPagedFeeds();
                 }
                 else
@@ -178,15 +198,31 @@ namespace BrickRed.WebParts.Facebook.Wall
             lbtnNext.ID = "lbtnNext";
             lbtnNext.Click += new EventHandler(lbtnNext_Click);
             Table Maintable = new Table();
-            TableRow trContent = new TableRow();
+            TableRow trContent;
+            //Maintable.Width = Unit.Percentage(100);
+            Maintable.CssClass = "fbMainTable";
+            Maintable.CellPadding = 0;
+            Maintable.CellSpacing = 0;
 
+            //Create the header
+            if (this.ShowHeader)
+            {
+                trContent = new TableRow();
+                tcContent = new TableCell();
+                tcContent.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.ShowHeaderImage));
+                tcContent.CssClass = "fbHeaderTitleBranded";
+                trContent.Cells.Add(tcContent);
+                Maintable.Rows.Add(trContent);
+            }
+
+            trContent = new TableRow();
+            tcContent = new TableCell();
             tcContent.Controls.Add(ShowFeeds(string.Empty));
+
             trContent.Controls.Add(tcContent);
             Maintable.Controls.Add(trContent);
             tcpaging.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
-            tcpaging.Height = 20;
             tcpaging.ID = "tcpaging";
-            tcpaging.Attributes.Add("style", "background-color: #EDEFF4;border: 1px solid #D8DFEA;");
 
             tcpaging.Controls.Add(lbtnNext);
             trpaging.Controls.Add(tcpaging);
@@ -280,20 +316,19 @@ namespace BrickRed.WebParts.Facebook.Wall
                 ViewState["html"] = mergedFeeds;
                 foreach (JSONObject feed in mergedFeeds)
                 {
-
                     tr = new TableRow();
+                    tr.CssClass = "ms-WPBorderBorderOnly fbMainRow";
 
-                    if (i % 2 != 0)
-                    {
-                        tr.CssClass = "ms-alternatingstrong";
-                    }
                     if (ShowUserImage)
                     {
                         tcImage = new TableCell();
-                        tcImage.CssClass = "ms-vb2";
-                        Image image = new Image();
+                        //tcImage.CssClass = "ms-vb2";
+                        System.Web.UI.WebControls.Image image = new System.Web.UI.WebControls.Image();
                         image.ImageUrl = string.Format("https://graph.facebook.com/{0}/picture", feed.Dictionary["from"].Dictionary["id"].String);
+                        image.CssClass = "fbHeaderImage";
+                        tcImage.Width = Unit.Percentage(5);
                         tcImage.Controls.Add(image);
+                        tcImage.VerticalAlign = VerticalAlign.Middle;
                         tr.Cells.Add(tcImage);
                     }
                     tc = new TableCell();
@@ -326,25 +361,46 @@ namespace BrickRed.WebParts.Facebook.Wall
             TimeSpan ts = curDate.Subtract(origStamp);
             string strReturn = string.Empty;
 
-            if (ts.Days >= 1)
+            if (ts.Days > 365)               //years
             {
-                strReturn = String.Format("{0:hh:mm tt MMM dd}" + "th", Convert.ToDateTime(pastTime).ToUniversalTime());
+                if (ts.Days == 365)
+                    strReturn = "about " + 1 + " year ago";
+                else
+                    strReturn = "about " + ts.Days / 365 + " years ago";
+            }
+            else if (ts.Days >= 30)         //months
+            {
+                if (ts.Days == 30)
+                    strReturn = "about " + 1 + " month ago";
+                else
+                    strReturn = "about " + ts.Days / 30 + " months ago";
+            }
+            else if (ts.Days >= 7)           //weeks
+            {
+                if (ts.Days == 7)
+                    strReturn = "about " + 1 + " week ago";
+                else
+                    strReturn = "about " + ts.Days / 7 + " weeks ago";
+            }
+            else if (ts.Days > 0)          //days
+            {
+                strReturn = "about " + ts.Days + " days ago";
+            }
+            else if (ts.Hours >= 1)          //hours
+            {
+                strReturn = "about " + ts.Hours + " hours ago";
             }
             else
             {
-                if (ts.Hours >= 1)
-                    strReturn = "about " + ts.Hours + " hours ago";
-                else
+                if (ts.Minutes >= 1)
                 {
-                    if (ts.Minutes >= 1)
-                    {
-                        strReturn = "about " + ts.Minutes + " minutes ago";
-                    }
-                    else
-                        strReturn = "about " + ts.Seconds + " seconds ago";
+                    strReturn = "about " + ts.Minutes + " minutes ago";
                 }
+                else
+                    strReturn = "about " + ts.Seconds + " seconds ago";
             }
             return strReturn;
+
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -415,9 +471,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                         throw new Exception(obj.Dictionary["error"].Dictionary["type"].String, new Exception(obj.Dictionary["error"].Dictionary["message"].String));
                     }
                 }
-
-
-
             }
             catch (Exception Ex)
             {
@@ -455,7 +508,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                         feedTableRow.Cells.Add(feedTableCell);
 
                         childTable = new Table();
-                        childTable.CellPadding = 5;
+                        childTable.CellPadding = 2;
                         childRow = new TableRow();
                         childTable.Rows.Add(childRow);
                         childCell = new TableCell();
@@ -468,23 +521,22 @@ namespace BrickRed.WebParts.Facebook.Wall
                 case "photo":
                 case "link":
                 case "video":
-
                     //create a feed table cell and add child table
                     feedTableCell = new TableCell();
                     feedTableRow.Cells.Add(feedTableCell);
                     childTable = new Table();
-                    childTable.CellPadding = 5;
+                    childTable.CellPadding = 2;
                     feedTableCell.Controls.Add(childTable);
 
                     if (feed.Dictionary.ContainsKey("picture"))
                     {
                         childRow = new TableRow();
                         childTable.Rows.Add(childRow);
-                        Image image = new Image();
+                        System.Web.UI.WebControls.Image image = new System.Web.UI.WebControls.Image();
                         image.ImageUrl = feed.Dictionary["picture"].String;
-
+                        image.Width = Unit.Pixel(90);
                         childCell = new TableCell();
-                        childCell.RowSpan = 4;
+                        childCell.RowSpan = 3;
                         childRow.Cells.Add(childCell);
                         childCell.Controls.Add(image);
                     }
@@ -507,18 +559,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                         }
                     }
 
-
-                    if (feed.Dictionary.ContainsKey("message"))
-                    {
-                        //next row
-                        childRow = new TableRow();
-                        childTable.Rows.Add(childRow);
-                        childCell = new TableCell();
-                        childCell.Text = feed.Dictionary["message"].String;
-                        childRow.Cells.Add(childCell);
-                    }
-
-
                     if (feed.Dictionary.ContainsKey("description"))
                     {
                         //first cell and add table of status data
@@ -527,37 +567,30 @@ namespace BrickRed.WebParts.Facebook.Wall
                         childTable.Rows.Add(childRow);
                         childCell = new TableCell();
                         childCell.Text = feed.Dictionary["description"].String;
+                        childCell.CssClass = "fbWallDescription";
                         childRow.Cells.Add(childCell);
                     }
-
                     break;
             }
 
-
-
             //second row in main feed table to display the additional information
-
             feedTableRow = new TableRow();
             feedTable.Rows.Add(feedTableRow);
-            if (counter % 2 != 0)
-            {
-                feedTableRow.CssClass = "ms-alternatingstrong";
-            }
+            
             //first cell for feed icon
             feedTableCell = new TableCell();
             feedTableRow.Cells.Add(feedTableCell);
 
             ///now the child table for data
             childTable = new Table();
-            childTable.CellPadding = 5;
+            childTable.CellPadding = 2;
             childRow = new TableRow();
             childTable.Rows.Add(childRow);
             feedTableCell.Controls.Add(childTable);
 
-
             if (feed.Dictionary.ContainsKey("icon"))
             {
-                Image image = new Image();
+                System.Web.UI.WebControls.Image image = new System.Web.UI.WebControls.Image();
                 image.ImageUrl = feed.Dictionary["icon"].String;
 
                 childCell = new TableCell();
@@ -585,5 +618,6 @@ namespace BrickRed.WebParts.Facebook.Wall
         }
 
         #endregion
+
     }
 }

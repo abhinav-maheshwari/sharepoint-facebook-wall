@@ -53,6 +53,7 @@
     <Reference Include="Microsoft.SharePoint.Security" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code Files\CommonHelper.cs" />
     <Compile Include="Code Files\Enumerators.cs" />
     <Compile Include="Code Files\JSONObject.cs" />
     <Compile Include="Code Files\ProgressTemplate.cs" />
@@ -71,6 +72,9 @@
       <SharePointProjectItemId>{21949790-61be-46f6-ac3e-c273e27e8ed4}</SharePointProjectItemId>
     </None>
     <None Include="key.snk" />
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{385efdb2-0eb1-46df-9ba0-5d612c48cba0}</SharePointProjectItemId>
+    </None>
     <None Include="LikeBox\LikeBox.webpart" />
     <None Include="LikeBox\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{db1e7c12-5074-4824-82a2-1fad15515e0e}</SharePointProjectItemId>
@@ -103,6 +107,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Images\BrickRed\BrickRedFeatureLogo.png" />
+    <Content Include="Layouts\BrickRed.WebParts.Facebook.Wall\Style.css" />
     <Content Include="LikeBox\Elements.xml" />
     <Content Include="LikeButton\Elements.xml" />
     <Content Include="ShowWall\Elements.xml">

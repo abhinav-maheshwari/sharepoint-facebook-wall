@@ -54,7 +54,11 @@ namespace BrickRed.WebParts.Facebook.Wall
         private HtmlGenericControl pnlPropertyPostAsWhat;
         private Panel seperatorDiv;
         private LiteralControl lineBreak;
-        private HtmlGenericControl paragraph; 
+        private HtmlGenericControl paragraph;
+
+        private TextBox txtUserID;
+        private CheckBox chkShowHeader;
+        private CheckBox chkShowHeaderImage;
 
         public WriteOnWallEditorPart(string webPartID)
         {
@@ -66,15 +70,10 @@ namespace BrickRed.WebParts.Facebook.Wall
         protected override void CreateChildControls() 
         { 
             base.CreateChildControls();
-
             pnlFacebookSettings = new Panel();
-
             pnlCommonSettings = new Panel();
-
             pnlPostToWallSettings = new Panel();
-
             lineBreak = new LiteralControl("<br/>");
-
             seperatorDiv = new Panel();
             seperatorDiv.Attributes.Add("class", "UserDottedLine");
             seperatorDiv.Attributes.Add("style", "width: 100%;");
@@ -99,7 +98,6 @@ namespace BrickRed.WebParts.Facebook.Wall
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
            
-
             //Client ID
             pnlProperty = new Panel();
             pnlPropertyName = new Panel();
@@ -115,12 +113,9 @@ namespace BrickRed.WebParts.Facebook.Wall
             pnlPropertyControl.Controls.Add(txtAuthClientID);
             pnlProperty.Controls.Add(pnlPropertyControl);
 
-
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
-
-           
 
             //Redirect Url
             pnlProperty = new Panel();
@@ -161,7 +156,66 @@ namespace BrickRed.WebParts.Facebook.Wall
             paragraph = new HtmlGenericControl("p");
             paragraph.Controls.Add(pnlProperty);
             pnlCommonSettings.Controls.Add(paragraph);
-           
+
+
+            //User ID
+            pnlProperty = new Panel();
+            pnlPropertyName = new Panel();
+            pnlPropertyControl = new Panel();
+
+            lblProperty = new Label();
+            lblProperty.Text = "User Id / User Name / Page Id:<br/><br/>";
+            pnlPropertyName.Controls.Add(lblProperty);
+            pnlProperty.Controls.Add(pnlPropertyName);
+
+            txtUserID = new TextBox();
+            txtUserID.Width = Unit.Percentage(100);
+            pnlPropertyControl.Controls.Add(txtUserID);
+            pnlProperty.Controls.Add(pnlPropertyControl);
+
+            paragraph = new HtmlGenericControl("p");
+            paragraph.Controls.Add(pnlProperty);
+            pnlCommonSettings.Controls.Add(paragraph);
+
+            //Show Header 
+            pnlProperty = new Panel();
+            pnlPropertyName = new Panel();
+            pnlPropertyControl = new Panel();
+
+            lblProperty = new Label();
+            lblProperty.Text = "Show header:";
+            pnlPropertyName.Controls.Add(lblProperty);
+            pnlProperty.Controls.Add(pnlPropertyName);
+
+            chkShowHeader = new CheckBox();
+            chkShowHeader.Checked = false;
+            chkShowHeader.AutoPostBack = false;
+            pnlPropertyControl.Controls.Add(chkShowHeader);
+            pnlProperty.Controls.Add(pnlPropertyControl);
+
+            paragraph = new HtmlGenericControl("p");
+            paragraph.Controls.Add(pnlProperty);
+            pnlCommonSettings.Controls.Add(paragraph);
+
+            //Show Header Image 
+            pnlProperty = new Panel();
+            pnlPropertyName = new Panel();
+            pnlPropertyControl = new Panel();
+
+            lblProperty = new Label();
+            lblProperty.Text = "Show header image:";
+            pnlPropertyName.Controls.Add(lblProperty);
+            pnlProperty.Controls.Add(pnlPropertyName);
+
+            chkShowHeaderImage = new CheckBox();
+            chkShowHeaderImage.Checked = false;
+            chkShowHeaderImage.AutoPostBack = false;
+            pnlPropertyControl.Controls.Add(chkShowHeaderImage);
+            pnlProperty.Controls.Add(pnlPropertyControl);
+
+            paragraph = new HtmlGenericControl("p");
+            paragraph.Controls.Add(pnlProperty);
+            pnlCommonSettings.Controls.Add(paragraph);
 
             //Show user name 
            
@@ -210,6 +264,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             rdoBtnListPostLocation = new RadioButtonList();
             rdoBtnListPostLocation.Items.Add(new ListItem("On my wall", "postToYourWall"));
             rdoBtnListPostLocation.Items.Add(new ListItem("On my page", "postToPageWall"));
+            rdoBtnListPostLocation.Items.Add(new ListItem("On my group", "postToGroupWall"));
             rdoBtnListPostLocation.Items.FindByValue("postToYourWall").Selected = true;
             rdoBtnListPostLocation.AutoPostBack = false;
             pnlPropertyControl.Controls.Add(rdoBtnListPostLocation);
@@ -233,7 +288,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             pnlPropertyControl = new Panel();
 
             Label lblPageID = new Label();
-            lblPageID.Text = "Page ID:<br/><br/>";
+            lblPageID.Text = "Page ID / Group ID:<br/><br/>";
             pnlPropertyName.Controls.Add(lblPageID);
             pnlPropertyPostAsWhat.Controls.Add(pnlPropertyName);
 
@@ -250,6 +305,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             rdoBtnListPostAsWhat.Items.Add(new ListItem("Current User", "postAsThisUser"));
             rdoBtnListPostAsWhat.Items.Add(new ListItem("Current Page", "postAsPage"));
             rdoBtnListPostAsWhat.Items[0].Selected = true;
+            rdoBtnListPostAsWhat.Items.FindByValue("postAsPage").Attributes.Add("ID", "rdoPostAsPage");
             rdoBtnListPostAsWhat.AutoPostBack = false;
             pnlPropertyPostAsWhat.Controls.Add(rdoBtnListPostAsWhat);
 
@@ -269,7 +325,6 @@ namespace BrickRed.WebParts.Facebook.Wall
 
         }
 
-       
         public override bool ApplyChanges() 
         { 
             EnsureChildControls();
@@ -282,9 +337,11 @@ namespace BrickRed.WebParts.Facebook.Wall
                 webPart.OAuthClientID = txtAuthClientID.Text;
                 webPart.OAuthClientSecret = txtAuthClientSecret.Text;
                 webPart.OAuthRedirectUrl = txtAuthRedirectUrl.Text;
+                webPart.UserID = txtUserID.Text.Trim();
+                webPart.ShowHeader = chkShowHeader.Checked ? true : false;
+                webPart.ShowHeaderImage = chkShowHeaderImage.Checked ? true : false;
 
                 //checking for sites with anonymous access and setting show user name property
-
                 if (chkShowUserName.Visible)
                 {
                     webPart.EnableShowUserName = chkShowUserName.Checked;
@@ -297,22 +354,37 @@ namespace BrickRed.WebParts.Facebook.Wall
                 //check if posting to your wall or page's wall
                 if (rdoBtnListPostLocation.SelectedItem.Value.Equals("postToYourWall"))
                 {
-                    webPart.PostOnProfile = true;                 
+                    webPart.PostOnProfile = true;
+                    webPart.PostOnGroupWall = false;
                     pnlPropertyPostAsWhat.Attributes["style"] = "display:none";
+                }
+                else if (rdoBtnListPostLocation.SelectedItem.Value.Equals("postToGroupWall"))
+                {
+                    webPart.PostOnProfile = false;
+                    webPart.PostOnGroupWall = true;
+                    pnlPropertyPostAsWhat.Attributes["style"] = "display:block";
                 }
                 else
                 {
-                    webPart.PostOnProfile = false;                 
+                    webPart.PostOnProfile = false;
                     pnlPropertyPostAsWhat.Attributes["style"] = "display:block";
                 }
 
                 //setting facebook page id given by the user
                 webPart.OAuthPageID = txtPageID.Text;
 
-                //check if posting as this user or as page
-                if (rdoBtnListPostAsWhat.SelectedItem.Value.Equals("postAsPage"))
+                //Post as Current User if the post is to be posted at the Groups wall
+                if (!webPart.PostOnGroupWall)
                 {
-                    webPart.PostAsPage = true;
+                    //check if posting as this user or as page
+                    if (rdoBtnListPostAsWhat.SelectedItem.Value.Equals("postAsPage"))
+                    {
+                        webPart.PostAsPage = true;
+                    }
+                    else
+                    {
+                        webPart.PostAsPage = false;
+                    }
                 }
                 else
                 {
@@ -342,15 +414,19 @@ namespace BrickRed.WebParts.Facebook.Wall
 
                     if (webPart.PostOnProfile)
                     {
-                        rdoBtnListPostLocation.Items.FindByValue("postToYourWall").Selected = true;                      
+                        rdoBtnListPostLocation.Items.FindByValue("postToYourWall").Selected = true;
                         pnlPropertyPostAsWhat.Attributes["style"] = "display:none";
+                    }
+                    else if (webPart.PostOnGroupWall)
+                    {
+                        rdoBtnListPostLocation.Items.FindByValue("postToGroupWall").Selected = true;
+                        pnlPropertyPostAsWhat.Attributes["style"] = "display:block";
                     }
                     else
                     {
-                        rdoBtnListPostLocation.Items.FindByValue("postToPageWall").Selected = true;                                     
+                        rdoBtnListPostLocation.Items.FindByValue("postToPageWall").Selected = true;
                         pnlPropertyPostAsWhat.Attributes["style"] = "display:block";
                     }
-
 
                     txtPageID.Text = webPart.OAuthPageID;
 
@@ -362,14 +438,12 @@ namespace BrickRed.WebParts.Facebook.Wall
                     {
                         rdoBtnListPostAsWhat.Items.FindByValue("postAsThisUser").Selected = true;
                     }
-               
                }
         }
 
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-
             string scriptShowHidePostAsWhatDiv = @"<script language='javascript' type='text/javascript'>
                                                     // Show hide post as what div based on selected value
                                                      function ShowHidePostAsWhatDiv(radiobuttonlistitemvalue,divid)
@@ -377,28 +451,31 @@ namespace BrickRed.WebParts.Facebook.Wall
                                                            if(radiobuttonlistitemvalue=='postToPageWall')
                                                               {
                                                                  document.getElementById(divid).style.display='block';
+                                                                 document.getElementById('rdoPostAsPage').style.display='block';
                                                                }
-                                                            else
+                                                            else if(radiobuttonlistitemvalue=='postToYourWall')
                                                               {
                                                                  document.getElementById(divid).style.display='none';   
+                                                              }
+                                                            else
+                                                              {
+                                                                 document.getElementById(divid).style.display='block';                                                                 
+                                                                 document.getElementById('rdoPostAsPage').style.display='none';
                                                               }
                                                              
                                                         }
                                                     </script>";
 
             this.Page.ClientScript.RegisterStartupScript(this.GetType(), "scriptShowHidePostAsWhatDiv", scriptShowHidePostAsWhatDiv);
-
             foreach (ListItem item in rdoBtnListPostLocation.Items)
-            {               
-                item.Attributes.Add("onclick", "ShowHidePostAsWhatDiv('" + item.Value + "','postAsWhatDiv');");               
+            {
+                item.Attributes.Add("onclick", "ShowHidePostAsWhatDiv('" + item.Value + "','postAsWhatDiv');");
             }
         }
 
         protected override void Render(System.Web.UI.HtmlTextWriter output) 
         {
             base.Render(output);
-          
         } 
-
     }
 }
