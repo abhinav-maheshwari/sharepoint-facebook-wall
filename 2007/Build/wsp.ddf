@@ -9,6 +9,8 @@
 manifest.xml manifest.xml
 BrickRed.WebParts.Facebook.Wall\feature.xml BrickRed.WebParts.Facebook.Wall\feature.xml
 BrickRed.WebParts.Facebook.Wall\BrickRedFeatureLogo.png IMAGES\BrickRed\BrickRedFeatureLogo.png
+BrickRed.WebParts.Facebook.Wall\Layouts\BrickRed.WebParts.Facebook.Wall\Style.css LAYOUTS\BrickRed.WebParts.Facebook.Wall\Style.css
+
 BrickRed.WebParts.Facebook.Wall.dll BrickRed.WebParts.Facebook.Wall.dll
 
 BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart BrickRed.WebParts.Facebook.Wall\ShowWall\ShowWall.webpart
