@@ -1,0 +1,100 @@
+﻿.fbHeaderTitleBranded
+{
+    background-color: #3B5998 !important;
+    color: white;
+    cursor: default;
+    padding-top: 7px;
+    /*border: 2px solid #FFFFFF !important;*/
+}
+
+.fbHeaderMainTable
+{
+    background-color: #3B5998 !important;
+    border-bottom: 1px solid #3B5998 !important;
+    border: 0px;
+}
+
+.ms-WPBody td
+{
+    border-bottom: 0px !important;
+}
+
+.fbHeaderLink
+{
+    font-size: 13px;
+    color: White;
+    text-decoration: none;
+    padding-left: 10px;
+    vertical-align: middle;
+    text-align: left;
+    font-family: verdana,arial,helvetica,sans-serif;
+    background-color: #3B5998 !important;
+    border-bottom: 1px solid #3B5998 !important;
+}
+
+.fbHeaderLink a, .fbHeaderLink a:link, .fbHeaderLink a:Active, .fbHeaderLink a:Hover, .fbHeaderLink a:visited
+{
+    color: White;
+    font-size: 13px;
+    text-decoration: none;
+    font-family: verdana,arial,helvetica,sans-serif;
+    background-color: #3B5998 !important;
+    border-bottom: 1px solid #3B5998 !important;
+}
+
+.fbHeaderImage
+{
+    text-align: right;
+    padding-right: 10px;
+    background-color: #3B5998 !important;
+    border-bottom: 1px solid #3B5998 !important;
+}
+
+.fbHeaderImage IMG
+{
+    height: 17px;
+    width: 60px;
+    background-color: #3B5998 !important;
+    border-bottom: 1px solid #3B5998 !important;
+}
+
+.fbTextBox
+{
+    width: 99.8%;
+    margin-top: -2PX;
+    padding: 0px;
+    border: 1px solid #D2CE97;
+}
+
+.fbMainRow
+{
+    margin: 5px !important;
+    border: 1px solid #3B5998 !important;
+}
+
+.fbHeaderImage
+{
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.fbMainTable
+{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ms-WPBorderBorderOnly
+{
+    padding: 1px;
+}
+
+.fbWallMessage
+{
+    word-wrap: break-word;
+}
+
+.fbWallDescription
+{
+    word-wrap: break-word;
+}
