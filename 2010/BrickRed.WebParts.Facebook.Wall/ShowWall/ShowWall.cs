@@ -199,7 +199,6 @@ namespace BrickRed.WebParts.Facebook.Wall
             lbtnNext.Click += new EventHandler(lbtnNext_Click);
             Table Maintable = new Table();
             TableRow trContent;
-            //Maintable.Width = Unit.Percentage(100);
             Maintable.CssClass = "fbMainTable";
             Maintable.CellPadding = 0;
             Maintable.CellSpacing = 0;
@@ -317,7 +316,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                 foreach (JSONObject feed in mergedFeeds)
                 {
                     tr = new TableRow();
-                    tr.CssClass = "ms-WPBorderBorderOnly fbMainRow";
+                    tr.CssClass = "fbMainRow";
 
                     if (ShowUserImage)
                     {
