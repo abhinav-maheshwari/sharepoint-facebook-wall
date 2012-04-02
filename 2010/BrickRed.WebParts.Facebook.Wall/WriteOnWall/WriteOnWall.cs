@@ -44,6 +44,7 @@ namespace BrickRed.WebParts.Facebook.Wall
     {
         Label LblMessage;
         TextBox textWall;
+        string oAuthToken;
 
         #region Webpart Properties
 
@@ -108,6 +109,10 @@ namespace BrickRed.WebParts.Facebook.Wall
                     !String.IsNullOrEmpty(this.UserID)
                     )
             {
+
+                //first get the authentication token 
+                oAuthToken = CommonHelper.GetOAuthToken("publish_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+
                 this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
                 base.CreateChildControls();
                 try
@@ -131,7 +136,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                         mainTable.Rows.Add(tr);
                         tc = new TableCell();
                         tr.Cells.Add(tc);
-                        tc.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.ShowHeaderImage));
+                        tc.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.oAuthToken, this.ShowHeaderImage));
                         tc.CssClass = "fbHeaderTitleBranded";
                     }
 
@@ -205,20 +210,8 @@ namespace BrickRed.WebParts.Facebook.Wall
         {
             try
             {
-                string oAuthToken;
+                
                 bool userMemberOfGroup = false;
-
-                string url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope=publish_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
-
-                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateFacebookCertificate);
-
-                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-                {
-                    StreamReader reader = new StreamReader(response.GetResponseStream());
-                    string retVal = reader.ReadToEnd();
-                    oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
-                }
 
                 string postUrl = string.Empty;
 

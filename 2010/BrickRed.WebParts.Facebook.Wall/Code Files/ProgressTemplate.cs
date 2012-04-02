@@ -47,7 +47,6 @@ namespace BrickRed.WebParts.Facebook.Wall
             tblProgress.Width = Unit.Percentage(100);
             tblProgress.CellSpacing = 0;
             tblProgress.CellPadding = 0;
-            tblProgress.CssClass = "ms-viewlsts";
             TableRow trProgress = new TableRow();
             TableCell tcProgress = new TableCell();
             tcProgress.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;

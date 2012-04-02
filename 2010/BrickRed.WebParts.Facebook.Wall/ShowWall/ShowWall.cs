@@ -32,7 +32,6 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
 using System.Net;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Collections.Generic;
 using System.Drawing;
@@ -46,6 +45,7 @@ namespace BrickRed.WebParts.Facebook.Wall
     {
         #region Public Controls
         Label LblMessage;
+        string oAuthToken;
         LinkButton lbtnNext = new LinkButton();
         TableCell tcContent = new TableCell();
         TableCell tcpaging = new TableCell();
@@ -162,6 +162,9 @@ namespace BrickRed.WebParts.Facebook.Wall
                     !String.IsNullOrEmpty(this.UserID)
                     )
                 {
+                    //first get the authentication token 
+                    oAuthToken = CommonHelper.GetOAuthToken("read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+
                     this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
                     ShowPagedFeeds();
                 }
@@ -193,7 +196,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             pagingTable.Width = Unit.Percentage(100);
             pagingTable.CellSpacing = 0;
             pagingTable.CellPadding = 0;
-            pagingTable.CssClass = "ms-viewlsts";
+            pagingTable.CssClass = "fbPagingTable";
             lbtnNext.Text = "Older Posts";
             lbtnNext.ID = "lbtnNext";
             lbtnNext.Click += new EventHandler(lbtnNext_Click);
@@ -208,7 +211,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             {
                 trContent = new TableRow();
                 tcContent = new TableCell();
-                tcContent.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.ShowHeaderImage));
+                tcContent.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.oAuthToken, this.ShowHeaderImage));
                 tcContent.CssClass = "fbHeaderTitleBranded";
                 trContent.Cells.Add(tcContent);
                 Maintable.Rows.Add(trContent);
@@ -216,6 +219,8 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             trContent = new TableRow();
             tcContent = new TableCell();
+
+            //get the feeds here 
             tcContent.Controls.Add(ShowFeeds(string.Empty));
 
             trContent.Controls.Add(tcContent);
@@ -271,7 +276,6 @@ namespace BrickRed.WebParts.Facebook.Wall
             mainTable.Width = Unit.Percentage(100);
             mainTable.CellSpacing = 0;
             mainTable.CellPadding = 0;
-            mainTable.CssClass = "ms-viewlsts";
             int feedsCount = 0;
 
             JSONObject me = GetFeeds(FeedURL);
@@ -321,7 +325,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                     if (ShowUserImage)
                     {
                         tcImage = new TableCell();
-                        //tcImage.CssClass = "ms-vb2";
                         System.Web.UI.WebControls.Image image = new System.Web.UI.WebControls.Image();
                         image.ImageUrl = string.Format("https://graph.facebook.com/{0}/picture", feed.Dictionary["from"].Dictionary["id"].String);
                         image.CssClass = "fbHeaderImage";
@@ -331,7 +334,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                         tr.Cells.Add(tcImage);
                     }
                     tc = new TableCell();
-                    tc.CssClass = "ms-vb2";
                     tc.Controls.Add(ParseFeed(feed, i));
                     tr.Cells.Add(tc);
                     mainTable.Rows.Add(tr);
@@ -412,26 +414,10 @@ namespace BrickRed.WebParts.Facebook.Wall
             JSONObject obj = null;
             string url;
             HttpWebRequest request;
-            string oAuthToken = string.Empty;
-
             try
             {
                 if (string.IsNullOrEmpty(FeedURL))
                 {
-
-                    url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope=read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
-
-                    //get the server certificate for calling https 
-                    ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateFacebookCertificate);
-                    request = WebRequest.Create(url) as HttpWebRequest;
-
-                    using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-                    {
-                        StreamReader reader = new StreamReader(response.GetResponseStream());
-                        string retVal = reader.ReadToEnd();
-                        oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
-                    }
-
                     if (!String.IsNullOrEmpty(oAuthToken))
                     {
                         if (IsPosts)
@@ -448,7 +434,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                     else
                     {
                         throw (new Exception("The access token returned was not valid."));
-
                     }
                 }
                 else
@@ -465,6 +450,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                     string retVal = reader.ReadToEnd();
 
                     obj = JSONObject.CreateFromString(retVal);
+
                     if (obj.IsDictionary && obj.Dictionary.ContainsKey("error"))
                     {
                         throw new Exception(obj.Dictionary["error"].Dictionary["type"].String, new Exception(obj.Dictionary["error"].Dictionary["message"].String));
@@ -514,7 +500,21 @@ namespace BrickRed.WebParts.Facebook.Wall
                         childCell.Text = feed.Dictionary["message"].String;
                         childRow.Cells.Add(childCell);
                         feedTableCell.Controls.Add(childTable);
+                    }
+                    if (feed.Dictionary.ContainsKey("story"))
+                    {
+                        //first cell and add table of status data
+                        feedTableCell = new TableCell();
+                        feedTableRow.Cells.Add(feedTableCell);
 
+                        childTable = new Table();
+                        childTable.CellPadding = 2;
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childCell.Text = feed.Dictionary["story"].String;
+                        childRow.Cells.Add(childCell);
+                        feedTableCell.Controls.Add(childTable);
                     }
                     break;
                 case "photo":
@@ -608,15 +608,6 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             return feedTable;
         }
-
-        #region Method to validate facebook certificate
-
-        private static bool ValidateFacebookCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors policyErrors)
-        {
-            return true;
-        }
-
-        #endregion
 
     }
 }
