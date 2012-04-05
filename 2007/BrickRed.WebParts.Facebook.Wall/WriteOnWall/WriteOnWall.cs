@@ -23,18 +23,15 @@
  */
 using System;
 using System.Runtime.InteropServices;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
-using System.Xml.Serialization;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
-using Microsoft.SharePoint.WebPartPages;
 using System.Net;
 using System.IO;
-using System.ComponentModel;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace BrickRed.WebParts.Facebook.Wall
 {
@@ -43,6 +40,7 @@ namespace BrickRed.WebParts.Facebook.Wall
     {
         Label LblMessage;
         TextBox textWall;
+        string oAuthToken;
 
         #region Webpart Properties
 
@@ -94,7 +92,6 @@ namespace BrickRed.WebParts.Facebook.Wall
         [WebBrowsable(false),
       Personalizable(PersonalizationScope.Shared)]
         public bool ShowHeaderImage { get; set; }
-
         #endregion
 
         #region CreateChildControls event
@@ -108,8 +105,11 @@ namespace BrickRed.WebParts.Facebook.Wall
                    !String.IsNullOrEmpty(this.UserID)
                    )
             {
-                this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
 
+                //first get the authentication token 
+                oAuthToken = CommonHelper.GetOAuthToken("publish_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+
+                this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
                 base.CreateChildControls();
                 try
                 {
@@ -125,7 +125,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                     mainTable.CellPadding = 0;
 
                     this.Controls.Add(mainTable);
-
                     //Create the header
                     if (this.ShowHeader)
                     {
@@ -133,7 +132,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                         mainTable.Rows.Add(tr);
                         tc = new TableCell();
                         tr.Cells.Add(tc);
-                        tc.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.ShowHeaderImage));
+                        tc.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.oAuthToken, this.ShowHeaderImage));
                         tc.CssClass = "fbHeaderTitleBranded";
                     }
 
@@ -146,6 +145,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                     textWall.TextMode = TextBoxMode.MultiLine;
                     textWall.MaxLength = 140;
                     textWall.CssClass = "fbTextBox";
+
                     tc.Controls.Add(textWall);
 
                     tr = new TableRow();
@@ -160,6 +160,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                     buttonWriteOnWall.Text = "Share";
                     buttonWriteOnWall.Click += new EventHandler(buttonWriteOnWall_Click);
                     tc.Controls.Add(buttonWriteOnWall);
+
                 }
                 catch (Exception Ex)
                 {
@@ -185,6 +186,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             if (textWall != null)
             {
                 textWall.Text = string.Empty;
+
                 if (this.EnableShowUserName)
                 {
                     //if anonymous access is enabled,then don't show any user name
@@ -205,18 +207,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             try
             {
 
-                string oAuthToken;
                 bool userMemberOfGroup = false;
-
-                string url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope=publish_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
-                
-                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-                {
-                    StreamReader reader = new StreamReader(response.GetResponseStream());
-                    string retVal = reader.ReadToEnd();
-                    oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
-                }
 
                 string postUrl = string.Empty;
 
@@ -272,9 +263,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                 {
                     if (this.PostAsPage)
                     {
-
                         JSONObject me = GetUserPages(oAuthToken);
-
                         if (me.Dictionary["data"] != null)
                         {
                             JSONObject[] userAccounts = me.Dictionary["data"].Array;
@@ -286,37 +275,27 @@ namespace BrickRed.WebParts.Facebook.Wall
                                     LblMessage = new Label();
                                     LblMessage.Text = "Manage pages permission has not been given to this application.In order for this application to post on your page as your page's account, you need to give this application 'Manage Pages' permission.Please go to the following url to grant this permission:" + string.Format("<a target='_blank' href='https://www.facebook.com/dialog/oauth?client_id={0}&redirect_uri={1}&scope=manage_pages&response_type=token'>https://www.facebook.com/dialog/oauth?client_id={0}&redirect_uri={1}&scope=manage_pages&response_type=token</a>", this.OAuthClientID, this.OAuthRedirectUrl);
                                     this.Controls.Add(LblMessage);
-
                                 }
                                 else
                                 {
-
                                     bool userAccountFound = false;
-
                                     foreach (JSONObject userAccount in userAccounts)
                                     {
-
                                         if (userAccount.Dictionary["id"].String.Equals(this.OAuthPageID.Trim()))
                                         {
                                             userAccountFound = true;
                                             postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID.Trim(), userAccount.Dictionary["access_token"].String, textWall.Text.Trim());
                                             break;
                                         }
-
-
                                     }
-
 
                                     if (!userAccountFound)
                                     {
                                         LblMessage = new Label();
                                         LblMessage.Text = "The given page was not found in the list of pages.Please make sure that this user is the admin of the page that you have specified.";
                                         this.Controls.Add(LblMessage);
-
                                     }
-
                                 }
-
                             }
                             else
                             {
@@ -324,30 +303,22 @@ namespace BrickRed.WebParts.Facebook.Wall
                                 LblMessage.Text = "The given page was not found.";
                                 this.Controls.Add(LblMessage);
                             }
-
                         }
                         else
                         {
                             LblMessage = new Label();
                             LblMessage.Text = "No pages found for the given account.";
                             this.Controls.Add(LblMessage);
-
                         }
-
                     }
                     else
                     {
-
                         postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID, oAuthToken, textWall.Text.Trim());
-
                     }
-
                 }
-
 
                 if (!String.IsNullOrEmpty(postUrl))
                 {
-
                     HttpWebRequest request2 = WebRequest.Create(postUrl) as HttpWebRequest;
                     request2.Method = "post";
                     using (HttpWebResponse response2 = request2.GetResponse() as HttpWebResponse)
@@ -370,15 +341,10 @@ namespace BrickRed.WebParts.Facebook.Wall
                             {
                                 LblMessage.Text = "Message successfully posted on page.";
                             }
-
                             this.Controls.Add(LblMessage);
-
                         }
                     }
-
                 }
-
-
             }
             catch (Exception Ex)
             {
@@ -386,6 +352,14 @@ namespace BrickRed.WebParts.Facebook.Wall
                 LblMessage.Text = "An error occurred while posting on wall:" + Ex.Message;
                 this.Controls.Add(LblMessage);
             }
+        }
+        #endregion
+
+        #region Method to validate facebook certificate
+
+        private static bool ValidateFacebookCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors policyErrors)
+        {
+            return true;
         }
 
         #endregion
@@ -473,5 +447,6 @@ namespace BrickRed.WebParts.Facebook.Wall
         }
 
         #endregion
+
     }
 }

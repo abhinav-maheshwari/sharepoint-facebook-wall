@@ -22,27 +22,61 @@
  ===========================================================================
  */
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Net;
+using System.IO;
 using System.Web.UI.WebControls;
 using System.Web.UI;
-using System.IO;
-using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace BrickRed.WebParts.Facebook.Wall
 {
     public class CommonHelper
     {
-        private static JSONObject GetUserDetails(string UserID)
+        /// <summary>
+        /// Generates the access token for this application
+        /// </summary>
+        /// <param name="Type"></param>
+        /// <returns></returns>
+        public static string GetOAuthToken(string scope, string OAuthClientID, string OAuthRedirectUrl, string OAuthClientSecret, string OAuthCode)
+        {
+            string oAuthToken = string.Empty;
+            string cacheKey = string.Format("oAuthToken-{0}", scope);
+
+            //first we need to check if this oAuthtoken is present in cache or not
+            if (System.Web.HttpContext.Current.Cache.Get(cacheKey) == null)
+            {
+                string url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope={4}", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode,scope);
+
+                //get the server certificate for calling https 
+                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateFacebookCertificate);
+                WebRequest request = WebRequest.Create(url) as HttpWebRequest;
+
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                {
+                    StreamReader reader = new StreamReader(response.GetResponseStream());
+                    string retVal = reader.ReadToEnd();
+                    oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
+                    System.Web.HttpContext.Current.Cache.Add(cacheKey, oAuthToken, null, DateTime.Now.AddMinutes(15), TimeSpan.Zero, System.Web.Caching.CacheItemPriority.Normal, null);
+                }
+            }
+            else
+            {
+                oAuthToken = System.Web.HttpContext.Current.Cache.Get(cacheKey) as string;
+            }
+
+            return oAuthToken;
+        }
+
+        private static JSONObject GetUserDetails(string UserID, string oAuthToken)
         {
             JSONObject obj = null;
             string url;
             HttpWebRequest request;
-            string oAuthToken = string.Empty;
 
             try
             {
-                url = string.Format("https://graph.facebook.com/{0}", UserID);
+                url = string.Format("https://graph.facebook.com/{0}?access_token={1}", UserID, oAuthToken);
 
                 //now send the request to facebook
                 request = WebRequest.Create(url) as HttpWebRequest;
@@ -68,10 +102,10 @@ namespace BrickRed.WebParts.Facebook.Wall
             return obj;
         }
 
-        private static string GetUserName(string UserID)
+        private static string GetUserName(string UserID, string access_token)
         {
             string strUserName = string.Empty;
-            JSONObject me = GetUserDetails(UserID);
+            JSONObject me = GetUserDetails(UserID, access_token);
             if (me.Dictionary["name"] != null)
             {
                 strUserName = me.Dictionary["name"].String;
@@ -79,12 +113,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             return strUserName;
         }
 
-        /// <summary>
-        /// Create the Header of the Webpart
-        /// </summary>
-        /// <param name="Type"></param>
-        /// <returns></returns>
-        public static Table CreateHeader(string UserID, bool ShowHeaderImage)
+        public static Table CreateHeader(string UserID, string oAuthToken, bool ShowHeaderImage)
         {
             Table tbHeader;
             TableRow trHeader;
@@ -125,7 +154,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             //Creating the name hyperlink in header
             tcinner = new TableCell();
             HyperLink hplnkName = new HyperLink();
-            hplnkName.Text = GetUserName(UserID);
+            hplnkName.Text = GetUserName(UserID, oAuthToken);
             hplnkName.NavigateUrl = "http://www.facebook.com/profile.php?id=" + UserID;
             hplnkName.Attributes.Add("target", "_blank");
             tcinner.Controls.Add(hplnkName);
@@ -155,8 +184,13 @@ namespace BrickRed.WebParts.Facebook.Wall
         public static LiteralControl InlineStyle()
         {
             LiteralControl ltrInlineCSS = new LiteralControl();
-            ltrInlineCSS.Text = "<link href='/_layouts/BrickRed.WebParts.Facebook.Wall/style.css' rel='stylesheet' type='text/css' />";
+            ltrInlineCSS.Text = "<link href='/_layouts/BrickRed.WebParts.Facebook.Wall/BrickRed.Facebook.Wall.css' rel='stylesheet' type='text/css' />";
             return ltrInlineCSS;
+        }
+
+        private static bool ValidateFacebookCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors policyErrors)
+        {
+            return true;
         }
     }
 }
