@@ -12,6 +12,6 @@
   </Assemblies>
   <TemplateFiles>
     <TemplateFile Location="IMAGES\BrickRed\BrickRedFeatureLogo.png"></TemplateFile>
-    <TemplateFile Location="LAYOUTS\BrickRed.WebParts.Facebook.Wall\Style.css"></TemplateFile>
+    <TemplateFile Location="LAYOUTS\BrickRed.WebParts.Facebook.Wall\BrickRed.Facebook.Wall.css"></TemplateFile>
   </TemplateFiles>
 </Solution>
