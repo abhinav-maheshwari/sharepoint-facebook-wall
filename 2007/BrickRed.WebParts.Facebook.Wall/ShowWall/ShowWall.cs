@@ -532,9 +532,26 @@ namespace BrickRed.WebParts.Facebook.Wall
                         image.ImageUrl = feed.Dictionary["picture"].String;
                         image.Width = Unit.Pixel(90);
                         childCell = new TableCell();
-                        childCell.RowSpan = 3;
+                        childCell.RowSpan = 4;
                         childRow.Cells.Add(childCell);
                         childCell.Controls.Add(image);
+                    }
+
+                    if (feed.Dictionary.ContainsKey("message"))
+                    {
+                        //next row
+                        childRow = new TableRow();
+                        childTable.Rows.Add(childRow);
+                        childCell = new TableCell();
+                        childRow.Cells.Add(childCell);
+
+                        //Remove the link from the message
+                        string message = feed.Dictionary["message"].String;
+                        if (message.ToLower().Contains("http"))
+                        {
+                            message = message.Remove(message.IndexOf("http"), feed.Dictionary["link"].String.Length);
+                        }
+                        childCell.Text = message;
                     }
 
                     if (feed.Dictionary.ContainsKey("name"))
