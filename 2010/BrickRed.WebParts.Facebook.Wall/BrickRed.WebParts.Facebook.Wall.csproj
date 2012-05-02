@@ -108,6 +108,7 @@
     </Content>
     <Content Include="Images\BrickRed\BrickRedFeatureLogo.png" />
     <Content Include="Layouts\BrickRed.WebParts.Facebook.Wall\BrickRed.Facebook.Wall.css" />
+    <Content Include="Layouts\BrickRed.WebParts.Facebook.Wall\Images\Likes.png" />
     <Content Include="LikeBox\Elements.xml" />
     <Content Include="LikeButton\Elements.xml" />
     <Content Include="ShowWall\Elements.xml">
