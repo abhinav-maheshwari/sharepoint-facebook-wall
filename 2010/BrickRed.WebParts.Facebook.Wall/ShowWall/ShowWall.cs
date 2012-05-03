@@ -616,7 +616,18 @@ namespace BrickRed.WebParts.Facebook.Wall
 
             }
 
-            //Show Likes
+            if (feed.Dictionary.ContainsKey("created_time"))
+            {
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                childCell.Text = RelativeTime(feed.Dictionary["created_time"].String.ToString());
+                childCell.Style.Add("color", "Gray");
+            }
+
+            childRow = new TableRow();
+            childTable.Rows.Add(childRow);
+
+            //Show Likes info
             if (feed.Dictionary.ContainsKey("likes"))
             {
                 childCell = new TableCell();
@@ -632,7 +643,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                 childRow.Cells.Add(childCell);
                 Label lbl_Likes = new Label();
                 lbl_Likes.Text = feed.Dictionary["likes"].Dictionary["count"].String + " people";
-                lbl_Likes.CssClass = "fbLikes";
+                lbl_Likes.CssClass = "fbLikes mrgn";
 
                 // get the story id
                 string[] fbinfo = feed.Dictionary["id"].String.Split('_');
@@ -658,31 +669,33 @@ namespace BrickRed.WebParts.Facebook.Wall
                 childCell.Controls.Add(img_Like);
             }
 
-            //show Comments
+            //show Comments Info
             if (feed.Dictionary.ContainsKey("comments"))
             {
+                //Showing Comment image
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                System.Web.UI.WebControls.Image img_Comment = new System.Web.UI.WebControls.Image();
+                img_Comment.ImageUrl = ImagePath + "comments.png";
+                img_Comment.CssClass = "fbLikes";
+
+                childCell.Controls.Add(img_Comment);
+
+                //Showing Text
                 childCell = new TableCell();
                 childRow.Cells.Add(childCell);
                 Label lbl_Comment = new Label();
-                lbl_Comment.Text = "Comment";
-                lbl_Comment.CssClass = "fbLikes";
+                lbl_Comment.Text = "View all " + feed.Dictionary["comments"].Dictionary["count"].String + " Comments";
+                lbl_Comment.CssClass = "fbLikes mrgn";
 
                 // get the story id
                 string[] fbinfo = feed.Dictionary["id"].String.Split('_');
                 lbl_Comment.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+                img_Comment.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
 
                 childCell.Controls.Add(lbl_Comment);
             }
             
-
-            if (feed.Dictionary.ContainsKey("created_time"))
-            {
-                childCell = new TableCell();
-                childRow.Cells.Add(childCell);
-                childCell.Text = RelativeTime(feed.Dictionary["created_time"].String.ToString());
-                childCell.Style.Add("color", "Gray");
-            }
-
             return feedTable;
         }
 
