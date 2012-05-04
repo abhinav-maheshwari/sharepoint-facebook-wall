@@ -41,11 +41,11 @@ namespace BrickRed.WebParts.Facebook.Wall
         public static string GetOAuthToken(string scope, string OAuthClientID, string OAuthRedirectUrl, string OAuthClientSecret, string OAuthCode)
         {
             string oAuthToken = string.Empty;
-            string cacheKey = string.Format("oAuthToken-{0}", scope);
+            //string cacheKey = string.Format("oAuthToken-{0}", scope);
 
             //first we need to check if this oAuthtoken is present in cache or not
-            if (System.Web.HttpContext.Current.Cache.Get(cacheKey) == null)
-            {
+            //if (System.Web.HttpContext.Current.Cache.Get(cacheKey) == null)
+            //{
                 string url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope={4}", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode,scope);
 
                 //get the server certificate for calling https 
@@ -57,13 +57,13 @@ namespace BrickRed.WebParts.Facebook.Wall
                     StreamReader reader = new StreamReader(response.GetResponseStream());
                     string retVal = reader.ReadToEnd();
                     oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
-                    System.Web.HttpContext.Current.Cache.Add(cacheKey, oAuthToken, null, DateTime.Now.AddMinutes(15), TimeSpan.Zero, System.Web.Caching.CacheItemPriority.Normal, null);
+                    //System.Web.HttpContext.Current.Cache.Add(cacheKey, oAuthToken, null, DateTime.Now.AddMinutes(15), TimeSpan.Zero, System.Web.Caching.CacheItemPriority.Normal, null);
                 }
-            }
-            else
-            {
-                oAuthToken = System.Web.HttpContext.Current.Cache.Get(cacheKey) as string;
-            }
+            //}
+            //else
+            //{
+            //    oAuthToken = System.Web.HttpContext.Current.Cache.Get(cacheKey) as string;
+            //}
 
             return oAuthToken;
         }

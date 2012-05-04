@@ -28,6 +28,7 @@ using System.Web.UI.WebControls.WebParts;
 using Microsoft.SharePoint.WebPartPages;
 using System.Net;
 using System.IO;
+using Microsoft.SharePoint;
 
 
 namespace BrickRed.WebParts.Facebook.Wall
@@ -41,6 +42,7 @@ namespace BrickRed.WebParts.Facebook.Wall
         LinkButton lbtnNext = new LinkButton();
         TableCell tcContent = new TableCell();
         TableCell tcpaging = new TableCell();
+        string ImagePath = SPContext.Current.Web.Url + "/_layouts/BrickRed.WebParts.Facebook.Wall/Images/";
         #endregion
 
         #region Check for the Posts User want to see
@@ -619,6 +621,78 @@ namespace BrickRed.WebParts.Facebook.Wall
                 childRow.Cells.Add(childCell);
                 childCell.Text = RelativeTime(feed.Dictionary["created_time"].String.ToString());
                 childCell.Style.Add("color", "Gray");
+            }
+
+            childRow = new TableRow();
+            childTable.Rows.Add(childRow);
+
+            //Show Likes info
+            if (feed.Dictionary.ContainsKey("likes"))
+            {
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                System.Web.UI.WebControls.Image img_Like = new System.Web.UI.WebControls.Image();
+                img_Like.ImageUrl = ImagePath + "Likes.png";
+                img_Like.CssClass = "fbLikes";
+
+                childCell.Controls.Add(img_Like);
+
+                //Showing the number of likes
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                Label lbl_Likes = new Label();
+                lbl_Likes.Text = feed.Dictionary["likes"].Dictionary["count"].String + " people";
+                lbl_Likes.CssClass = "fbLikes mrgn";
+
+                // get the story id
+                string[] fbinfo = feed.Dictionary["id"].String.Split('_');
+                lbl_Likes.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+                img_Like.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+
+                Label lbl_likeThis = new Label();
+                lbl_likeThis.Text = " like this.";
+
+                childCell.Controls.Add(lbl_Likes);
+                childCell.Controls.Add(lbl_likeThis);
+            }
+            else        // Show only like image
+            {
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                System.Web.UI.WebControls.Image img_Like = new System.Web.UI.WebControls.Image();
+                img_Like.ImageUrl = ImagePath + "Likes.png";
+                img_Like.CssClass = "fbLikes";
+                string[] fbinfo = feed.Dictionary["id"].String.Split('_');
+                img_Like.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+
+                childCell.Controls.Add(img_Like);
+            }
+
+            //show Comments Info
+            if (feed.Dictionary.ContainsKey("comments"))
+            {
+                //Showing Comment image
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                System.Web.UI.WebControls.Image img_Comment = new System.Web.UI.WebControls.Image();
+                img_Comment.ImageUrl = ImagePath + "comments.png";
+                img_Comment.CssClass = "fbLikes";
+
+                childCell.Controls.Add(img_Comment);
+
+                //Showing Text
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                Label lbl_Comment = new Label();
+                lbl_Comment.Text = "View all " + feed.Dictionary["comments"].Dictionary["count"].String + " Comments";
+                lbl_Comment.CssClass = "fbLikes mrgn";
+
+                // get the story id
+                string[] fbinfo = feed.Dictionary["id"].String.Split('_');
+                lbl_Comment.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+                img_Comment.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+
+                childCell.Controls.Add(lbl_Comment);
             }
 
             return feedTable;
