@@ -10,6 +10,8 @@ manifest.xml manifest.xml
 BrickRed.WebParts.Facebook.Wall\feature.xml BrickRed.WebParts.Facebook.Wall\feature.xml
 BrickRed.WebParts.Facebook.Wall\BrickRedFeatureLogo.png IMAGES\BrickRed\BrickRedFeatureLogo.png
 BrickRed.WebParts.Facebook.Wall\Layouts\BrickRed.WebParts.Facebook.Wall\BrickRed.Facebook.Wall.css LAYOUTS\BrickRed.WebParts.Facebook.Wall\BrickRed.Facebook.Wall.css
+BrickRed.WebParts.Facebook.Wall\Layouts\BrickRed.WebParts.Facebook.Wall\Images\Comments.png LAYOUTS\BrickRed.WebParts.Facebook.Wall\Images\Comments.png
+BrickRed.WebParts.Facebook.Wall\Layouts\BrickRed.WebParts.Facebook.Wall\Images\Likes.png LAYOUTS\BrickRed.WebParts.Facebook.Wall\Images\Likes.png
 
 BrickRed.WebParts.Facebook.Wall.dll BrickRed.WebParts.Facebook.Wall.dll
 
