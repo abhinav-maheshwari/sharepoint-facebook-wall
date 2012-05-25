@@ -116,7 +116,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                 image.Width = 50;
                 image.Border = 0;
                 HyperLink hplnkImage = new HyperLink();
-                hplnkImage.NavigateUrl = "http://www.facebook.com/profile.php?id=" + UserID;
+                hplnkImage.NavigateUrl = "https://www.facebook.com/profile.php?id=" + UserID;
                 hplnkImage.Attributes.Add("target", "_blank");
                 hplnkImage.Controls.Add(image);
                 tcinner.Controls.Add(hplnkImage);
@@ -128,7 +128,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             tcinner = new TableCell();
             HyperLink hplnkName = new HyperLink();
             hplnkName.Text = GetUserName(UserID, oAuthToken);
-            hplnkName.NavigateUrl = "http://www.facebook.com/profile.php?id=" + UserID;
+            hplnkName.NavigateUrl = "https://www.facebook.com/profile.php?id=" + UserID;
             hplnkName.Attributes.Add("target", "_blank");
             tcinner.Controls.Add(hplnkName);
             tcinner.CssClass = "fbHeaderLink";
@@ -138,10 +138,10 @@ namespace BrickRed.WebParts.Facebook.Wall
             tcinner.CssClass = "fbHeaderImage";
             System.Web.UI.HtmlControls.HtmlImage imageFB = new System.Web.UI.HtmlControls.HtmlImage();
             imageFB.Attributes.Add("class", "imageFB");
-            imageFB.Src = "http://www.facebook.com/images/fb_logo_small.png";
+            imageFB.Src = "https://www.facebook.com/images/fb_logo_small.png";
             imageFB.Border = 0;
             HyperLink hplnkImageFB = new HyperLink();
-            hplnkImageFB.NavigateUrl = "http://www.facebook.com/";
+            hplnkImageFB.NavigateUrl = "https://www.facebook.com/";
             hplnkImageFB.Attributes.Add("target", "_blank");
             hplnkImageFB.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
             hplnkImageFB.Controls.Add(imageFB);

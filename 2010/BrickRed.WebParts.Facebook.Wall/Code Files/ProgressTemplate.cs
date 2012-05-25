@@ -38,7 +38,7 @@ namespace BrickRed.WebParts.Facebook.Wall
 
         public ProgressTemplate()
         {
-            ImagePath = "http://static.ak.fbcdn.net/rsrc.php/v1/yb/r/GsNJNwuI-UM.gif";           
+            ImagePath = "https://static.ak.fbcdn.net/rsrc.php/v1/yb/r/GsNJNwuI-UM.gif";           
         }
 
         public void InstantiateIn(Control container)
