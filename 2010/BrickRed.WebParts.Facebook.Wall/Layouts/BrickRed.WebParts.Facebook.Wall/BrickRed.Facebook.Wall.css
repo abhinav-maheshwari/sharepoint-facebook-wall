@@ -1,6 +1,6 @@
 ﻿.fbHeaderTitleBranded
 {
-    background: #3B5998;
+    background: #3B5998 !important;
     color: white;
     cursor: default;
     padding-bottom: 5px;
@@ -21,6 +21,8 @@
     vertical-align: middle;
     text-align: left;
     font-family: verdana,arial,helvetica,sans-serif;
+    background:#3B5998 !important;
+    border-bottom: 0px !important;
 }
 
 .fbHeaderLink a, .fbHeaderLink a:link, .fbHeaderLink a:Active, .fbHeaderLink a:Hover, .fbHeaderLink a:visited
@@ -35,6 +37,8 @@
 {
     text-align: right;
     padding-right: 10px;
+    background:#3B5998 !important;
+    border-bottom: 0px !important;
 }
 
 .fbHeaderImage IMG
