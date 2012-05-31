@@ -553,7 +553,14 @@ namespace BrickRed.WebParts.Facebook.Wall
                         string message = feed.Dictionary["message"].String;
                         if(message.ToLower().Contains("http"))
                         {
-                            message = message.Remove( message.IndexOf("http"), feed.Dictionary["link"].String.Length);
+                            if (feed.Dictionary["link"].String.Contains("?"))
+                            {
+                                int linkCount = feed.Dictionary["link"].String.Remove(feed.Dictionary["link"].String.IndexOf("http"), feed.Dictionary["link"].String.Length - feed.Dictionary["link"].String.IndexOf("?")).Length;
+                                message = message.Remove(message.IndexOf("http"), linkCount);
+
+                            }
+                            else
+                                message = message.Remove(message.IndexOf("http"), feed.Dictionary["link"].String.Length);
                         }
                         childCell.Text = message;
                     }
@@ -645,10 +652,12 @@ namespace BrickRed.WebParts.Facebook.Wall
                 lbl_Likes.Text = feed.Dictionary["likes"].Dictionary["count"].String + " people";
                 lbl_Likes.CssClass = "fbLikes mrgn";
 
+                //get the like url
+                string likeURL = feed.Dictionary["actions"].Array[1].Dictionary["link"].String;
+
                 // get the story id
-                string[] fbinfo = feed.Dictionary["id"].String.Split('_');
-                lbl_Likes.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
-                img_Like.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+                lbl_Likes.Attributes.Add("onClick", "javascript:window.open('" + likeURL + "','_newtab');");
+                img_Like.Attributes.Add("onClick", "javascript:window.open(''" + likeURL + "','_newtab');");
 
                 Label lbl_likeThis = new Label();
                 lbl_likeThis.Text = " like this.";
@@ -663,10 +672,20 @@ namespace BrickRed.WebParts.Facebook.Wall
                 System.Web.UI.WebControls.Image img_Like = new System.Web.UI.WebControls.Image();
                 img_Like.ImageUrl = ImagePath + "Likes.png";
                 img_Like.CssClass = "fbLikes";
+                childCell.Controls.Add(img_Like);
+
+
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                Label lbl_likeThis = new Label();
+                lbl_likeThis.Text = " Like";
+                lbl_likeThis.CssClass = "fbLikes mrgn";
+
                 string[] fbinfo = feed.Dictionary["id"].String.Split('_');
                 img_Like.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+                lbl_likeThis.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
 
-                childCell.Controls.Add(img_Like);
+                childCell.Controls.Add(lbl_likeThis);
             }
 
             //show Comments Info
@@ -688,10 +707,14 @@ namespace BrickRed.WebParts.Facebook.Wall
                 lbl_Comment.Text = "View all " + feed.Dictionary["comments"].Dictionary["count"].String + " Comments";
                 lbl_Comment.CssClass = "fbLikes mrgn";
 
+
+                //get the comment url
+                string CommentURL = feed.Dictionary["actions"].Array[1].Dictionary["link"].String;
+
                 // get the story id
-                string[] fbinfo = feed.Dictionary["id"].String.Split('_');
-                lbl_Comment.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
-                img_Comment.Attributes.Add("onClick", "javascript:window.open('https://www.facebook.com/" + this.UserID + "/posts/" + fbinfo[1] + "','_newtab');");
+                //string[] fbinfo = feed.Dictionary["id"].String.Split('_');
+                lbl_Comment.Attributes.Add("onClick", "javascript:window.open('" + CommentURL + "','_newtab');");
+                img_Comment.Attributes.Add("onClick", "javascript:window.open('" + CommentURL + "','_newtab');");
 
                 childCell.Controls.Add(lbl_Comment);
             }
