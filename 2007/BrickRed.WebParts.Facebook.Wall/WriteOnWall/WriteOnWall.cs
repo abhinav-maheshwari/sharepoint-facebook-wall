@@ -208,12 +208,34 @@ namespace BrickRed.WebParts.Facebook.Wall
             {
 
                 bool userMemberOfGroup = false;
-
                 string postUrl = string.Empty;
+
+                string Comment = textWall.Text.Trim().Replace("\r\n", " ");      // variable to get the text to be written on wall
+                bool PostContainsMessage = true;            // false if the comment contains only URL
+                string Link = CheckForLinkInPost(Comment);  // To extract the link from the Comment if any (only single URL will be extracted
+
+                // Check if the comment contains only the URL
+                if (string.IsNullOrEmpty(Link))
+                    PostContainsMessage = string.IsNullOrEmpty(Comment.Replace(Link, "").Trim());
 
                 if (this.PostOnProfile)
                 {
-                    postUrl = string.Format("https://graph.facebook.com/me/feed?access_token={0}&message={1}", oAuthToken, textWall.Text.Trim());
+                    //postUrl = string.Format("https://graph.facebook.com/me/feed?access_token={0}&message={1}", oAuthToken, textWall.Text.Trim());
+                    // If only message is to be posted
+                    if (string.IsNullOrEmpty(Link))
+                    {
+                        postUrl = string.Format("https://graph.facebook.com/me/feed?access_token={0}&message={1}", oAuthToken, Comment);
+                    }
+                    // If only Lik is to be posted
+                    else if (!string.IsNullOrEmpty(Link) && !PostContainsMessage)
+                    {
+                        postUrl = string.Format("https://graph.facebook.com/me/feed?access_token={0}&link={1}", oAuthToken, Link);
+                    }
+                    // If comment contains both message and link
+                    else if (!string.IsNullOrEmpty(Link) && PostContainsMessage)
+                    {
+                        postUrl = string.Format("https://graph.facebook.com/me/feed?access_token={0}&link={1}&message={2}", oAuthToken, Link, Comment);
+                    }
                 }
                 else if (this.PostOnGroupWall)      //To Post on the Group wall
                 {
@@ -233,7 +255,23 @@ namespace BrickRed.WebParts.Facebook.Wall
                                 {
                                     //if its in the group form the url for posting the post
                                     userMemberOfGroup = true;
-                                    postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID, oAuthToken, textWall.Text.Trim());
+                                    //postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID, oAuthToken, textWall.Text.Trim());
+                                    
+                                    // If only message is to be posted
+                                    if (string.IsNullOrEmpty(Link))
+                                    {
+                                        postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID, oAuthToken, Comment);
+                                    }
+                                    // If only Link is to be posted
+                                    else if (!string.IsNullOrEmpty(Link) && !PostContainsMessage)
+                                    {
+                                        postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&Link={2}", this.OAuthPageID, oAuthToken, Link);
+                                    }
+                                    // If comment contains both message and link
+                                    else if (!string.IsNullOrEmpty(Link) && PostContainsMessage)
+                                    {
+                                        postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&Link={2}&message={3}", this.OAuthPageID, oAuthToken, Link, Comment);
+                                    }
                                     break;
                                 }
                             }
@@ -284,7 +322,24 @@ namespace BrickRed.WebParts.Facebook.Wall
                                         if (userAccount.Dictionary["id"].String.Equals(this.OAuthPageID.Trim()))
                                         {
                                             userAccountFound = true;
-                                            postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID.Trim(), userAccount.Dictionary["access_token"].String, textWall.Text.Trim());
+                                            //postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID.Trim(), userAccount.Dictionary["access_token"].String, textWall.Text.Trim());
+
+                                            // If only message is to be posted
+                                            if (string.IsNullOrEmpty(Link))
+                                            {
+                                                postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID.Trim(), userAccount.Dictionary["access_token"].String, Comment);
+                                            }
+                                            // If only Lik is to be posted
+                                            else if (!string.IsNullOrEmpty(Link) && !PostContainsMessage)
+                                            {
+                                                postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&link={2}", this.OAuthPageID.Trim(), userAccount.Dictionary["access_token"].String, Link);
+                                            }
+                                            // If comment contains both message and link
+                                            else if (!string.IsNullOrEmpty(Link) && PostContainsMessage)
+                                            {
+                                                postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}&link={3}", this.OAuthPageID.Trim(), userAccount.Dictionary["access_token"].String, Comment, Link);
+                                            }
+                                            
                                             break;
                                         }
                                     }
@@ -313,7 +368,23 @@ namespace BrickRed.WebParts.Facebook.Wall
                     }
                     else
                     {
-                        postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID, oAuthToken, textWall.Text.Trim());
+                        //postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID, oAuthToken, textWall.Text.Trim());
+
+                        // If only message is to be posted
+                        if (string.IsNullOrEmpty(Link))
+                        {
+                            postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}", this.OAuthPageID.Trim(), Comment);
+                        }
+                        // If only Lik is to be posted
+                        else if (!string.IsNullOrEmpty(Link) && !PostContainsMessage)
+                        {
+                            postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&link={2}", this.OAuthPageID.Trim(), Link);
+                        }
+                        // If comment contains both message and link
+                        else if (!string.IsNullOrEmpty(Link) && PostContainsMessage)
+                        {
+                            postUrl = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&message={2}&link={3}", this.OAuthPageID.Trim(), Comment, Link);
+                        }
                     }
                 }
 
@@ -354,6 +425,28 @@ namespace BrickRed.WebParts.Facebook.Wall
             }
         }
         #endregion
+
+        /// <summary>
+        /// Checking the comment for the URL, by splitting the string based on the space,
+        /// assumig that the URL will not contain the space.
+        /// </summary>
+        /// <param name="post"></param>
+        /// <returns></returns>
+        private string CheckForLinkInPost(string post)
+        {
+            string[] Comment = post.Split(' ');
+            string URLInComment = null;
+
+            foreach (string URL in Comment)
+            {
+                if (URL.ToLower().Contains("http") || URL.ToLower().Contains("www"))
+                {
+                    URLInComment = URL;
+                }
+            }
+
+            return URLInComment;
+        }
 
         #region Method to validate facebook certificate
 

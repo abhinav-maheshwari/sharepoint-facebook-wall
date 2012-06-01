@@ -551,7 +551,14 @@ namespace BrickRed.WebParts.Facebook.Wall
                         string message = feed.Dictionary["message"].String;
                         if (message.ToLower().Contains("http"))
                         {
-                            message = message.Remove(message.IndexOf("http"), feed.Dictionary["link"].String.Length);
+                            if (feed.Dictionary["link"].String.Contains("?"))
+                            {
+                                int linkCount = feed.Dictionary["link"].String.Remove(feed.Dictionary["link"].String.IndexOf("http"), feed.Dictionary["link"].String.Length - feed.Dictionary["link"].String.IndexOf("?")).Length;
+                                message = message.Remove(message.IndexOf("http"), linkCount);
+
+                            }
+                            else
+                                message = message.Remove(message.IndexOf("http"), feed.Dictionary["link"].String.Length);
                         }
                         childCell.Text = message;
                     }
