@@ -622,6 +622,18 @@ namespace BrickRed.WebParts.Facebook.Wall
                 childCell.Controls.Add(image);
 
             }
+            else
+            {
+                System.Web.UI.WebControls.Image image = new System.Web.UI.WebControls.Image();
+                image.ImageUrl = ImagePath + "big_transparent.gif";
+                image.Width = Unit.Pixel(16);
+                image.Height = Unit.Pixel(17);
+                image.BorderWidth = Unit.Pixel(0);
+
+                childCell = new TableCell();
+                childRow.Cells.Add(childCell);
+                childCell.Controls.Add(image);
+            }
 
             if (feed.Dictionary.ContainsKey("created_time"))
             {
