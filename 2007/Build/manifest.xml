@@ -15,5 +15,6 @@
     <TemplateFile Location="LAYOUTS\BrickRed.WebParts.Facebook.Wall\BrickRed.Facebook.Wall.css"></TemplateFile>
     <TemplateFile Location="LAYOUTS\BrickRed.WebParts.Facebook.Wall\Images\Likes.png"></TemplateFile>
     <TemplateFile Location="LAYOUTS\BrickRed.WebParts.Facebook.Wall\Images\Comments.png"></TemplateFile>
+	<TemplateFile Location="LAYOUTS\BrickRed.WebParts.Facebook.Wall\Images\big_transparent.gif"></TemplateFile>
   </TemplateFiles>
 </Solution>
