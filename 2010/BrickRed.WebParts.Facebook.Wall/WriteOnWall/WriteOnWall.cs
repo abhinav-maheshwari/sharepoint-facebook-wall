@@ -218,7 +218,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                 string Link = CheckForLinkInPost(Comment);  // To extract the link from the Comment if any (only single URL will be extracted
 
                 // Check if the comment contains only the URL
-                if (string.IsNullOrEmpty(Link))
+                if (!string.IsNullOrEmpty(Link))
                     PostContainsMessage = string.IsNullOrEmpty(Comment.Replace(Link, "").Trim());
 
                 if (this.PostOnProfile)
