@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Web.UI;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using System.Web;
 
 namespace BrickRed.WebParts.Facebook.Wall
 {
@@ -22,22 +23,22 @@ namespace BrickRed.WebParts.Facebook.Wall
         public static string GetOAuthToken(string scope, string OAuthClientID, string OAuthRedirectUrl, string OAuthClientSecret, string OAuthCode)
         {
             string oAuthToken = string.Empty;
-           
-                string url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope={4}", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode,scope);
 
-                url = url.Replace(" ", string.Empty);
+            string url = string.Format("https://graph.facebook.com/oauth/access_token?client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&scope={4}", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode, scope);
 
-                //get the server certificate for calling https 
-                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateFacebookCertificate);
-                WebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            url = url.Replace(" ", string.Empty);
 
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-                {
-                    StreamReader reader = new StreamReader(response.GetResponseStream());
-                    string retVal = reader.ReadToEnd();
-                    oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
-                }
-           
+            //get the server certificate for calling https 
+            ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateFacebookCertificate);
+            WebRequest request = WebRequest.Create(url) as HttpWebRequest;
+
+            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+            {
+                StreamReader reader = new StreamReader(response.GetResponseStream());
+                string retVal = reader.ReadToEnd();
+                oAuthToken = retVal.Substring(retVal.IndexOf("=") + 1, retVal.Length - retVal.IndexOf("=") - 1);
+            }
+
             return oAuthToken;
         }
 
@@ -46,7 +47,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             JSONObject obj = null;
             string url;
             HttpWebRequest request;
-         
+
             try
             {
                 url = string.Format("https://graph.facebook.com/{0}?access_token={1}", UserID, oAuthToken);
@@ -78,10 +79,30 @@ namespace BrickRed.WebParts.Facebook.Wall
         private static string GetUserName(string UserID, string access_token)
         {
             string strUserName = string.Empty;
-            JSONObject me = GetUserDetails(UserID, access_token);
-            if (me.Dictionary["name"] != null)
+            string cachingUserName = "caching_UserName_" + UserID;
+
+            //Check the user name from caching
+            if (HttpContext.Current.Cache.Get(cachingUserName) != null)
             {
-                strUserName = me.Dictionary["name"].String;
+                //Remove the caching if the webpart is in edit mode
+                if (HttpContext.Current.Cache.Get("cacheJSONKey_" + UserID) == null)
+                {
+                    HttpContext.Current.Cache.Remove(cachingUserName);
+                }
+                else
+                {
+                    strUserName = HttpContext.Current.Cache.Get(cachingUserName) as string;
+                }
+            }
+            else
+            {
+                JSONObject me = GetUserDetails(UserID, access_token);
+                if (me.Dictionary["name"] != null)
+                {
+                    strUserName = me.Dictionary["name"].String;
+
+                    HttpContext.Current.Cache.Add(cachingUserName, strUserName, null, DateTime.Now.AddHours(1), TimeSpan.Zero, System.Web.Caching.CacheItemPriority.Normal, null);
+                }
             }
             return strUserName;
         }

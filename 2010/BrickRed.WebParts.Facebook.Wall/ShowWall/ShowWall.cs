@@ -145,6 +145,18 @@ namespace BrickRed.WebParts.Facebook.Wall
         public bool ShowHeaderImage { get; set; }
         #endregion
 
+
+        /// <summary>
+        /// Property careated to identify the Caching object based on User Id
+        /// </summary>
+        private string CacheJSONKey
+        {
+            get
+            {
+                return "cacheJSONKey_" + this.UserID;
+            }
+        }
+
         protected override void OnInit(EventArgs e)
         {
             EnsureChildControls();
@@ -163,8 +175,9 @@ namespace BrickRed.WebParts.Facebook.Wall
                     !String.IsNullOrEmpty(this.UserID)
                     )
                 {
-                    //first get the authentication token 
-                    oAuthToken = CommonHelper.GetOAuthToken("read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+
+                    ////first get the authentication token 
+                    //oAuthToken = CommonHelper.GetOAuthToken("read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
 
                     this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
                     ShowPagedFeeds();
@@ -207,22 +220,22 @@ namespace BrickRed.WebParts.Facebook.Wall
             Maintable.CellPadding = 0;
             Maintable.CellSpacing = 0;
 
-            //Create the header
-            if (this.ShowHeader)
-            {
-                trContent = new TableRow();
-                tcContent = new TableCell();
-                tcContent.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.oAuthToken, this.ShowHeaderImage));
-                tcContent.CssClass = "fbHeaderTitleBranded";
-                trContent.Cells.Add(tcContent);
-                Maintable.Rows.Add(trContent);
-            }
-
             trContent = new TableRow();
             tcContent = new TableCell();
 
             //get the feeds here 
             tcContent.Controls.Add(ShowFeeds(string.Empty));
+
+            //Create the header
+            if (this.ShowHeader)
+            {
+                TableRow trHeaderContent = new TableRow();
+                TableCell tcHeaderContent = new TableCell();
+                tcHeaderContent.Controls.Add(CommonHelper.CreateHeader(this.UserID, this.oAuthToken, this.ShowHeaderImage));
+                tcHeaderContent.CssClass = "fbHeaderTitleBranded";
+                trHeaderContent.Cells.Add(tcHeaderContent);
+                Maintable.Rows.Add(trHeaderContent);
+            }
 
             trContent.Controls.Add(tcContent);
             Maintable.Controls.Add(trContent);
@@ -413,56 +426,82 @@ namespace BrickRed.WebParts.Facebook.Wall
         private JSONObject GetFeeds(string FeedURL)
         {
             JSONObject obj = null;
-            string url;
-            HttpWebRequest request;
-            try
+
+            //Check for the JSON object in the cache and check for the feedurl to identify if the request is for the Older posts
+            if (HttpContext.Current.Cache.Get(CacheJSONKey) != null && string.IsNullOrEmpty(FeedURL))
             {
-                if (string.IsNullOrEmpty(FeedURL))
+                //If the WebPart is edited then clear the cache
+                if (this.WebPartManager.DisplayMode == WebPartManager.EditDisplayMode)
                 {
-                    if (!String.IsNullOrEmpty(oAuthToken))
+                    HttpContext.Current.Cache.Remove(CacheJSONKey);
+                }
+                else
+                {
+                    obj = HttpContext.Current.Cache.Get(CacheJSONKey) as JSONObject;
+                }
+            }
+
+            if (obj == null)
+            {
+                //Call for the OAuth method to get the feeds only if the request is for the first time ( not for the "Older Post")
+                if (string.IsNullOrEmpty(FeedURL))
+                    oAuthToken = CommonHelper.GetOAuthToken("read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+
+                string url;
+                HttpWebRequest request;
+                try
+                {
+                    if (string.IsNullOrEmpty(FeedURL))
                     {
-                        if (IsPosts)
+                        if (!String.IsNullOrEmpty(oAuthToken))
                         {
-                            //if we need to show the user feeds only then call posts rest api
-                            url = string.Format("https://graph.facebook.com/{0}/posts?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
+                            if (IsPosts)
+                            {
+                                //if we need to show the user feeds only then call posts rest api
+                                url = string.Format("https://graph.facebook.com/{0}/posts?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
+                            }
+                            else
+                            {
+                                //else we need to call the feed rest api
+                                url = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
+                            }
                         }
                         else
                         {
-                            //else we need to call the feed rest api
-                            url = string.Format("https://graph.facebook.com/{0}/feed?access_token={1}&limit={2}", this.UserID, oAuthToken, WallCount);
+                            throw (new Exception("The access token returned was not valid."));
                         }
                     }
                     else
                     {
-                        throw (new Exception("The access token returned was not valid."));
+                        //this is the url that we got for next feed url...no need to generate the url from scratch
+                        url = FeedURL;
                     }
-                }
-                else
-                {
-                    //this is the url that we got for next feed url...no need to generate the url from scratch
-                    url = FeedURL;
-                }
 
-                //now send the request to facebook
-                request = WebRequest.Create(url) as HttpWebRequest;
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-                {
-                    StreamReader reader = new StreamReader(response.GetResponseStream());
-                    string retVal = reader.ReadToEnd();
-
-                    obj = JSONObject.CreateFromString(retVal);
-
-                    if (obj.IsDictionary && obj.Dictionary.ContainsKey("error"))
+                    //now send the request to facebook
+                    request = WebRequest.Create(url) as HttpWebRequest;
+                    using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                     {
-                        throw new Exception(obj.Dictionary["error"].Dictionary["type"].String, new Exception(obj.Dictionary["error"].Dictionary["message"].String));
+                        StreamReader reader = new StreamReader(response.GetResponseStream());
+                        string retVal = reader.ReadToEnd();
+
+                        obj = JSONObject.CreateFromString(retVal);
+
+                        //Cache only first page posts (No older posts)
+                        if (string.IsNullOrEmpty(FeedURL))
+                            HttpContext.Current.Cache.Add(CacheJSONKey, obj, null, DateTime.Now.AddHours(1), TimeSpan.Zero, System.Web.Caching.CacheItemPriority.Normal, null);
+
+                        if (obj.IsDictionary && obj.Dictionary.ContainsKey("error"))
+                        {
+                            throw new Exception(obj.Dictionary["error"].Dictionary["type"].String, new Exception(obj.Dictionary["error"].Dictionary["message"].String));
+                        }
                     }
                 }
-            }
-            catch (Exception Ex)
-            {
-                LblMessage = new Label();
-                LblMessage.Text = Ex.Message;
-                this.Controls.Add(LblMessage);
+                catch (Exception Ex)
+                {
+                    LblMessage = new Label();
+                    LblMessage.Text = Ex.Message;
+                    this.Controls.Add(LblMessage);
+                }
             }
             return obj;
         }
@@ -551,7 +590,7 @@ namespace BrickRed.WebParts.Facebook.Wall
 
                         //Remove the link from the message
                         string message = feed.Dictionary["message"].String;
-                        if(message.ToLower().Contains("http"))
+                        if (message.ToLower().Contains("http"))
                         {
                             if (feed.Dictionary["link"].String.Contains("?"))
                             {
@@ -600,7 +639,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             //second row in main feed table to display the additional information
             feedTableRow = new TableRow();
             feedTable.Rows.Add(feedTableRow);
-            
+
             //first cell for feed icon
             feedTableCell = new TableCell();
             feedTableRow.Cells.Add(feedTableCell);
@@ -701,7 +740,7 @@ namespace BrickRed.WebParts.Facebook.Wall
             }
 
             //show Comments Info
-            if (feed.Dictionary.ContainsKey("comments"))
+            if (feed.Dictionary.ContainsKey("comments") && feed.Dictionary.ContainsKey("actions"))
             {
                 //Showing Comment image
                 childCell = new TableCell();
@@ -719,6 +758,7 @@ namespace BrickRed.WebParts.Facebook.Wall
                 lbl_Comment.Text = "View all " + feed.Dictionary["comments"].Dictionary["count"].String + " Comments";
                 lbl_Comment.CssClass = "fbLikes mrgn";
 
+                lbl_Comment.Attributes.Add("style", "cursor: pointer");
 
                 //get the comment url
                 string CommentURL = feed.Dictionary["actions"].Array[1].Dictionary["link"].String;
@@ -730,7 +770,7 @@ namespace BrickRed.WebParts.Facebook.Wall
 
                 childCell.Controls.Add(lbl_Comment);
             }
-            
+
             return feedTable;
         }
 
