@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<List xmlns:ows="Microsoft SharePoint" 
+      Title="List Definition for Facebook Events" 
+      EnableContentTypes="TRUE"
+      FolderCreation="FALSE" 
+      Direction="$Resources:Direction;" 
+      Url="Lists/BrickRedFacebookEventsListDefinition" 
+      BaseType="0" 
+      xmlns="http://schemas.microsoft.com/sharepoint/">
+  <MetaData>
+    <ContentTypes>
+      <ContentTypeRef ID="0x0100DD356D3062C8470BB4882E7D77C0E624">
+        <Folder TargetName="Item" />
+      </ContentTypeRef>
+    </ContentTypes>
+    <Fields>
+      <Field ID="{FA01E2D1-AD3D-4851-BFC0-D7B15F90F74F}" DisplayName="Event Name/Type" Name="FBEventType" Required="TRUE" Type="Text"></Field>
+      <Field ID="{653AFEA4-5BB6-45DB-BFE9-649BCF70DD75}" DisplayName="Event Place" Name="FBEventPlace" Required="FALSE" Type="Text"></Field>
+      <Field ID="{6B32E4F5-C1AD-4C4B-A340-253E67C77AA5}" DisplayName="Event Description" Name="FBEventDescription" Required="FALSE" Type="Note"></Field>
+      <Field ID="{13DE786E-BC39-4F59-A850-FE5C9199F60A}" DisplayName="Event Start Date" Name="FBEventStartDate" Required="TRUE" Type="DateTime"></Field>
+      <Field ID="{3A206B92-FBA0-49EC-B343-78EAD0BDA934}" DisplayName="Event End Date" Name="FBEvenEndDate" Required="FALSE" Type="DateTime"></Field>
+      <Field ID="{59D74076-AE40-486B-BC41-E76982F89CE4}" DisplayName="Privacy Type" Name="FBPrivacyType" Required="TRUE" Type="Choice">
+        <CHOICES>
+          <CHOICE>OPEN</CHOICE>
+          <CHOICE>SECRET</CHOICE>
+          <CHOICE>FRIENDS</CHOICE>
+        </CHOICES>
+      </Field>
+      <Field ID="{1E2F373C-ACEC-4079-AF97-C2C27F755715}" DisplayName="IsSynchronized" Name="IsSynchronized" Required="TRUE" Type="Boolean" Hidden="TRUE">
+        <Default>False</Default>
+      </Field>
+    </Fields>
+    <Views>
+      <View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+          <FieldRef Name="LinkTitleNoMenu"></FieldRef>
+        </ViewFields>
+        <Query>
+          <OrderBy>
+            <FieldRef Name="Modified" Ascending="FALSE"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" />
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" />
+        </ParameterBindings>
+      </View>
+      <View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/images/generic.png" Url="AllItems.aspx">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+          <FieldRef Name="FBEventType"></FieldRef>
+          <FieldRef Name="FBEventPlace"></FieldRef>
+          <FieldRef Name="FBEventDescription"></FieldRef>
+          <FieldRef Name="FBEventStartDate"></FieldRef>
+          <FieldRef Name="FBEvenEndDate"></FieldRef>
+          <FieldRef Name="FBPrivacyType"></FieldRef>
+          <FieldRef Name="IsSynchronized"></FieldRef>
+        </ViewFields>
+        <Query>
+          <OrderBy>
+            <FieldRef Name="ID"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" />
+        </ParameterBindings>
+      </View>
+    </Views>
+    <Forms>
+      <Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+    </Forms>
+  </MetaData>
+</List>

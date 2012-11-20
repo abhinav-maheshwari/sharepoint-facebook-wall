@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Receivers >
+      <Receiver>
+        <Name>FacebookListEventRecieverListDeleting</Name>
+        <Type>ListDeleting</Type>
+        <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+        <Class>BrickRed.WebParts.Facebook.Wall.FacebookEvents.FacebookListEventReciever.FacebookListEventReciever</Class>
+        <SequenceNumber>10000</SequenceNumber>
+      </Receiver>
+      <Receiver>
+        <Name>FacebookListEventRecieverListAdded</Name>
+        <Type>ListAdded</Type>
+        <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+        <Class>BrickRed.WebParts.Facebook.Wall.FacebookEvents.FacebookListEventReciever.FacebookListEventReciever</Class>
+        <SequenceNumber>10000</SequenceNumber>
+      </Receiver>
+
+  </Receivers>
+</Elements>

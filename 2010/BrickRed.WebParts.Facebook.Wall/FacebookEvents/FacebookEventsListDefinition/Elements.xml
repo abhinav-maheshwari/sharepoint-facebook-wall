@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+    <!-- Do not change the value of the Name attribute below. If it does not match the folder name of the List Definition project item, an error will occur when the project is run. -->
+    <ListTemplate
+        Name="FacebookEventsListDefinition"
+        Type="10000"
+        BaseType="0"
+        OnQuickLaunch="TRUE"
+        SecurityBits="11"
+        Sequence="410"
+        DisplayName="List Definition for Facebook Events"
+        Description="This list definition creates the list for the BrickRed.Facebook.Events webpart"
+        Image="/_layouts/images/BrickRed/BrickRedFeatureLogo.png"/>
+
+  <Field ID="{FA01E2D1-AD3D-4851-BFC0-D7B15F90F74F}" DisplayName="Event Name/Type" Name="FBEventType" Required="TRUE" Type="Text"></Field>
+  <Field ID="{653AFEA4-5BB6-45DB-BFE9-649BCF70DD75}" DisplayName="Event Place" Name="FBEventPlace" Required="FALSE" Type="Text"></Field>
+  <Field ID="{6B32E4F5-C1AD-4C4B-A340-253E67C77AA5}" DisplayName="Event Description" Name="FBEventDescription" Required="FALSE" Type="Note"></Field>
+  <Field ID="{13DE786E-BC39-4F59-A850-FE5C9199F60A}" DisplayName="Event Start Date" Name="FBEventStartDate" Required="TRUE" Type="DateTime"></Field>
+  <Field ID="{3A206B92-FBA0-49EC-B343-78EAD0BDA934}" DisplayName="Event End Date" Name="FBEvenEndDate" Required="FALSE" Type="DateTime"></Field>
+  <Field ID="{59D74076-AE40-486B-BC41-E76982F89CE4}" DisplayName="Privacy Type" Name="FBPrivacyType" Required="TRUE" Type="Choice">
+    <CHOICES>
+      <CHOICE>OPEN</CHOICE>
+      <CHOICE>SECRET</CHOICE>
+      <CHOICE>FRIENDS</CHOICE>
+    </CHOICES>
+  </Field>
+  <Field ID="{1E2F373C-ACEC-4079-AF97-C2C27F755715}" DisplayName="IsSynchronized" Name="IsSynchronized" Required="TRUE" Type="Boolean" Hidden="TRUE">
+    <Default>False</Default>
+  </Field>
+
+  <ContentType ID="0x0100DD356D3062C8470BB4882E7D77C0E624"
+               Description="This is custom Content Type for BrickRed.Facebook.Events"
+               Name="BrickRed.Facebook.ContentType"
+               Version="0"
+               Group="BrickRed">
+
+    <FieldRefs>
+      <FieldRef ID="{FA01E2D1-AD3D-4851-BFC0-D7B15F90F74F}"/>
+      <FieldRef ID="{653AFEA4-5BB6-45DB-BFE9-649BCF70DD75}"/>
+      <FieldRef ID="{6B32E4F5-C1AD-4C4B-A340-253E67C77AA5}"/>
+      <FieldRef ID="{13DE786E-BC39-4F59-A850-FE5C9199F60A}"/>
+      <FieldRef ID="{3A206B92-FBA0-49EC-B343-78EAD0BDA934}"/>
+      <FieldRef ID="{59D74076-AE40-486B-BC41-E76982F89CE4}"/>
+      <FieldRef ID="{1E2F373C-ACEC-4079-AF97-C2C27F755715}"/>
+    </FieldRefs>
+    
+  </ContentType>
+</Elements>

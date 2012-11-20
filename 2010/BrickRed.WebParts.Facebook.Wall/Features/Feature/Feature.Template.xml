@@ -1,4 +1,9 @@
-<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Title="BrickRed Facebook WebParts" Description="Activate facebook wall, write on wall, like box and like button webparts" Id="4fcf719a-4baa-4e87-bae5-84e8c066080a" ImageUrl="/BrickRed/BrickRedFeatureLogo.png" Scope="Site">
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" 
+         Title="BrickRed Facebook WebParts" 
+         Description="Activate facebook wall, write on wall, like box and like button webparts" 
+         Id="4fcf719a-4baa-4e87-bae5-84e8c066080a" 
+         ImageUrl="/BrickRed/BrickRedFeatureLogo.png"          
+         Scope="Site">
   <ElementManifests>
     <ElementManifest Location="ShowWall\Elements.xml" />
     <ElementFile Location="ShowWall\ShowWall.webpart" />
@@ -8,5 +13,8 @@
     <ElementFile Location="LikeBox\LikeBox.webpart" />
     <ElementManifest Location="LikeButton\Elements.xml" />
     <ElementFile Location="LikeButton\LikeButton.webpart" />
+    <ElementManifest Location="FacebookEventsListDefinition\Elements.xml" />
+    <ElementFile Location="FacebookEventsListDefinition\Schema.xml" />
+    <ElementManifest Location="FacebookListEventReciever\Elements.xml" />
   </ElementManifests>
 </Feature>

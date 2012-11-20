@@ -58,6 +58,15 @@
     <Compile Include="Code Files\JSONObject.cs" />
     <Compile Include="Code Files\ProgressTemplate.cs" />
     <Compile Include="EditorParts\WriteOnWallEditorPart.cs" />
+    <Compile Include="FacebookEvents\BrickRed.Facebook.Events.Job.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FacebookEvents\FacebookListEventReciever\FacebookListEventReciever.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Features\Feature1\Feature1.EventReceiver.cs">
+      <DependentUpon>Feature1.feature</DependentUpon>
+    </Compile>
     <Compile Include="LikeBox\LikeBox.cs" />
     <Compile Include="LikeButton\LikeButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -65,6 +74,15 @@
     <Compile Include="WriteOnWall\WriteOnWall.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FacebookEvents\FacebookEventsListDefinition\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{3c443cea-9e8b-4a4f-b506-004d9cdd7d46}</SharePointProjectItemId>
+    </None>
+    <None Include="FacebookEvents\FacebookListEventReciever\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{654b9592-4ea3-489b-8638-c365a20d8d5f}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\Feature1\Feature1.feature">
+      <FeatureId>{3f30725f-9010-4bda-b9f2-5ea6c7aed429}</FeatureId>
+    </None>
     <None Include="Features\Feature\Feature.feature">
       <FeatureId>{d1ca5a00-1b44-4fa7-a7bd-6514f0590558}</FeatureId>
     </None>
@@ -99,9 +117,18 @@
       <SharePointProjectItemId>{f463a218-0c2f-423b-8be8-066edcf3c7c3}</SharePointProjectItemId>
     </None>
     <None Include="WriteOnWall\WriteOnWall.webpart" />
+    <None Include="XML\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1ccf4aef-8303-4e1d-995f-5a38c33b1d5f}</SharePointProjectItemId>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="FacebookEvents\FacebookEventsListDefinition\Elements.xml" />
+    <Content Include="FacebookEvents\FacebookEventsListDefinition\Schema.xml" />
+    <Content Include="FacebookEvents\FacebookListEventReciever\Elements.xml" />
+    <Content Include="Features\Feature1\Feature1.Template.xml">
+      <DependentUpon>Feature1.feature</DependentUpon>
+    </Content>
     <Content Include="Features\Feature\Feature.Template.xml">
       <DependentUpon>Feature.feature</DependentUpon>
       <SubType>Designer</SubType>
@@ -117,6 +144,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="WriteOnWall\Elements.xml" />
+    <Content Include="XML\BrickRed.Facebook.Wall\FacebookEvents.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" />

@@ -2,9 +2,11 @@
 <package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="25853faf-d7b8-4be2-8e38-4187a3b35ecb" solutionId="25853faf-d7b8-4be2-8e38-4187a3b35ecb" resetWebServer="false" name="BrickRed.Facebook.Webparts" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <features>
     <featureReference itemId="d1ca5a00-1b44-4fa7-a7bd-6514f0590558" />
+    <featureReference itemId="3f30725f-9010-4bda-b9f2-5ea6c7aed429" />
   </features>
   <projectItems>
     <projectItemReference itemId="21949790-61be-46f6-ac3e-c273e27e8ed4" />
     <projectItemReference itemId="385efdb2-0eb1-46df-9ba0-5d612c48cba0" />
+    <projectItemReference itemId="1ccf4aef-8303-4e1d-995f-5a38c33b1d5f" />
   </projectItems>
 </package>
