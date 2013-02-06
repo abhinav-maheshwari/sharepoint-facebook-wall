@@ -23,6 +23,7 @@ namespace BrickRed.WebParts.Facebook.Wall.Features.Feature1
         {
             SPSite Site = properties.Feature.Parent as SPSite;
 
+            //Check if the Facebook event job is already created, then delete the job
             foreach (SPJobDefinition jobDef in Site.WebApplication.JobDefinitions)
             {
                 if (jobDef.Name.Equals("BrickRed.Fcebook.Events"))
@@ -31,7 +32,7 @@ namespace BrickRed.WebParts.Facebook.Wall.Features.Feature1
                 }
             }
 
-
+            //Configure job
             BrickRed.WebParts.Facebook.Wall.FacebookEvents.FacebookEvents objJob = new BrickRed.WebParts.Facebook.Wall.FacebookEvents.FacebookEvents("BrickRed.Facebook.Events", Site.WebApplication);
             SPMinuteSchedule minSched = new SPMinuteSchedule();
             minSched.BeginSecond = 0;

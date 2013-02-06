@@ -197,6 +197,9 @@ namespace BrickRed.WebParts.Facebook.Wall
             }
         }
 
+        /// <summary>
+        /// This method is responsible to show feeds with paging
+        /// </summary>
         private void ShowPagedFeeds()
         {
             UpdatePanel refreshName = new UpdatePanel();
@@ -265,6 +268,11 @@ namespace BrickRed.WebParts.Facebook.Wall
             lbtnNext.OnClientClick = pagingTable.ClientID + ".style.visibility='hidden';";
         }
 
+        /// <summary>
+        /// Click of the more feeds button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void lbtnNext_Click(object sender, EventArgs e)
         {
             tcContent.Controls.Clear();
@@ -278,6 +286,11 @@ namespace BrickRed.WebParts.Facebook.Wall
             }
         }
 
+        /// <summary>
+        /// Create table of feeds to be shown
+        /// </summary>
+        /// <param name="FeedURL"></param>
+        /// <returns></returns>
         private Table ShowFeeds(string FeedURL)
         {
             Table mainTable = null;
@@ -368,6 +381,11 @@ namespace BrickRed.WebParts.Facebook.Wall
             return mainTable;
         }
 
+        /// <summary>
+        /// Gets the relative time of the feed 
+        /// </summary>
+        /// <param name="pastTime"></param>
+        /// <returns></returns>
         private string RelativeTime(string pastTime)
         {
             DateTime origStamp = DateTime.Parse(pastTime.ToString());
@@ -423,6 +441,11 @@ namespace BrickRed.WebParts.Facebook.Wall
             base.OnPreRender(e);
         }
 
+        /// <summary>
+        /// Get feeds from Facebook
+        /// </summary>
+        /// <param name="FeedURL"></param>
+        /// <returns></returns>
         private JSONObject GetFeeds(string FeedURL)
         {
             JSONObject obj = null;
@@ -506,6 +529,12 @@ namespace BrickRed.WebParts.Facebook.Wall
             return obj;
         }
 
+        /// <summary>
+        /// Parse feeds recieved from facebook
+        /// </summary>
+        /// <param name="feed"></param>
+        /// <param name="counter"></param>
+        /// <returns></returns>
         private Table ParseFeed(JSONObject feed, int counter)
         {
             Table feedTable;
