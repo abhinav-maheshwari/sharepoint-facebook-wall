@@ -96,6 +96,21 @@ namespace BrickRed.WebParts.Facebook.Wall
         [WebBrowsable(false),
         Personalizable(PersonalizationScope.Shared)]
         public bool ShowHeaderImage { get; set; }
+
+        private string _AuthToken;
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(""),
+        WebDisplayName("Auth Token"),
+        WebDescription("Saves auth token generated initialy from facebook")]
+        public string AuthToken
+        {
+            get { return _AuthToken; }
+            set { _AuthToken = value; }
+        }
+
         #endregion
 
         #region CreateChildControls event
@@ -111,7 +126,19 @@ namespace BrickRed.WebParts.Facebook.Wall
             {
 
                 //first get the authentication token 
-                oAuthToken = CommonHelper.GetOAuthToken("publish_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+
+                if (string.IsNullOrEmpty(this.AuthToken))
+                {
+                    oAuthToken = CommonHelper.GetOAuthToken("publish_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+                    this.AuthToken = oAuthToken;
+                    this.SetPersonalizationDirty();
+                }
+                else
+                {
+                    oAuthToken = this.AuthToken;
+                }
+
+                
 
                 this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
                 base.CreateChildControls();
@@ -200,6 +227,8 @@ namespace BrickRed.WebParts.Facebook.Wall
                     }
                 }
             }
+
+            ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
         }
 
         #endregion

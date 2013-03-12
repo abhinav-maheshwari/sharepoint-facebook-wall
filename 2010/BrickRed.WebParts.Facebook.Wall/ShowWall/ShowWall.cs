@@ -143,6 +143,23 @@ namespace BrickRed.WebParts.Facebook.Wall
         WebDisplayName("Show header image"),
         WebDescription("Would you like to Show Header Image")]
         public bool ShowHeaderImage { get; set; }
+
+
+        private string _AuthToken;
+        [WebBrowsable(true),
+        Category("Facebook Settings"),
+        Personalizable(PersonalizationScope.Shared),
+        WebPartStorage(Storage.Shared),
+        DefaultValue(""),
+        WebDisplayName("Auth Token"),
+        WebDescription("Saves auth token generated initialy from facebook")]
+        public string AuthToken
+        {
+            get { return _AuthToken; }
+            set { _AuthToken = value; }
+        }
+	
+
         #endregion
 
 
@@ -159,6 +176,7 @@ namespace BrickRed.WebParts.Facebook.Wall
 
         protected override void OnInit(EventArgs e)
         {
+            ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
             EnsureChildControls();
             base.OnInit(e);
         }
@@ -175,10 +193,6 @@ namespace BrickRed.WebParts.Facebook.Wall
                     !String.IsNullOrEmpty(this.UserID)
                     )
                 {
-
-                    ////first get the authentication token 
-                    //oAuthToken = CommonHelper.GetOAuthToken("read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
-
                     this.Page.Header.Controls.Add(CommonHelper.InlineStyle());
                     ShowPagedFeeds();
                 }
@@ -468,8 +482,18 @@ namespace BrickRed.WebParts.Facebook.Wall
             {
                 //Call for the OAuth method to get the feeds only if the request is for the first time ( not for the "Older Post")
                 if (string.IsNullOrEmpty(FeedURL))
-                    oAuthToken = CommonHelper.GetOAuthToken("read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
-
+                {
+                    if (string.IsNullOrEmpty(this.AuthToken))
+                    {
+                        oAuthToken = CommonHelper.GetOAuthToken("read_stream", OAuthClientID, OAuthRedirectUrl, OAuthClientSecret, OAuthCode);
+                        this.AuthToken = oAuthToken;
+                        this.SetPersonalizationDirty();
+                    }
+                    else
+                    {
+                        oAuthToken = this.AuthToken;
+                    }
+                }
                 string url;
                 HttpWebRequest request;
                 try
